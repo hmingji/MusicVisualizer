@@ -1,0 +1,125 @@
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+    --boston-blue-color: #4193a9;
+    --catskill-white-color: #eff5f7;
+    --blue-dianne-color: #1c474d;
+}
+
+.header {
+    display: grid;
+    padding-left: 32px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    background-color: var(--blue-dianne-color);
+}
+
+.header h1 {
+    color: white;
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+}
+
+.app-container {
+    display: flex;
+    height: calc(100% - 55px);
+}
+
+.setting-container {
+    padding: 1rem;
+    min-width: 300px;
+    width: 25%;
+    overflow: auto;
+    background-color: var(--catskill-white-color);    
+}
+
+.preview-container {
+    flex: 1;
+    overflow: auto;
+}
+
+.preview-container h3 {
+    color: var(--blue-dianne-color);
+    margin: 4px;
+}
+
+.audiofile-dropzone {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    border: dashed 3px var(--boston-blue-color);
+    border-radius: 1rem;
+    padding: 1rem;
+}
+
+.active {
+    border: dashed 3px var(--blue-dianne-color);
+}
+
+.audio-file {
+    display: none;
+}
+
+.audio-file + label {
+    background-color: var(--boston-blue-color);
+    border-radius: 4rem;
+    color: white;
+    cursor: pointer;
+    padding: 0.25rem 0.75rem;
+    text-align: center;
+    user-select: none;
+    display: inline-block;
+    margin-top: 0.75rem;
+}
+
+.audio-file:focus + label, 
+.audio-file + label:hover {
+    background-color: var(--blue-dianne-color);
+}
+
+.audiofile-dropzone h3 {
+    font-size: 1rem;
+    margin-top: 0.25rem;
+    text-align: center;
+    color: var(--blue-dianne-color);
+}
+
+#audio-visualizer-canvas {
+    justify-self: center;
+    width: 100%;
+    height: 80%;
+    border: 0;
+    /*background-color: var(--blue-dianne-color);*/
+    /*-webkit-filter: url('#goo');*/
+    filter: url('#goo');
+    
+    /*filter: blur(3px) contrast(100);*/
+    /* min height or min width to be defined */
+}
+
+#audio {
+    width: 100%;
+    margin-top: 4px;
+}
+
+button {
+    font-size: 1rem;
+    color: white;
+    background-color: var(--boston-blue-color);
+    border: 0;
+    border-radius: 4rem;
+    padding: 0.25rem 0.75rem;
+    cursor: pointer;
+    box-shadow: 7px 6px 28px 1px rgba(0, 0, 0, 0.24);
+    transition: 0.2s all;
+    margin-top: 4px;
+}
+
+button:active {
+    transform: scale(0.95);
+    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
+}
