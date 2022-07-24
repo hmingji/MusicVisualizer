@@ -27,6 +27,12 @@
                     <h3>or drag & drop your mp3 or wav file here</h3>
                 </div>
                 
+                <p>Wave Path</p>
+                <div class="wavepath-radiobutton-container">
+                    <input label="Horizontal" type="radio" name="wavepath" value="horizontal" checked>
+                    <input label="Circular" type="radio" name="wavepath" value="circular">
+                </div>
+
                 <button id="audioplay-button">Play</button>
 
             </div>
@@ -34,7 +40,10 @@
             <div class="preview-container">
                 <h3>Preview</h3>
                 <!-- next is to learn overlay multiple canvas-->
-                <canvas id="audio-visualizer-canvas"></canvas>
+                <div class="canvas-container">
+                    <canvas id="base-canvas"></canvas>
+                    <canvas id="audio-visualizer-canvas"></canvas>
+                </div>
                 <audio id="audio" controls></audio>
                 <svg>
                     <defs>
