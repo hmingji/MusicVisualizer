@@ -86,6 +86,7 @@ const baseCanvasCtx = baseCanvas.getContext('2d');
 let audioSource;
 let audioAnalyser;
 var wavePathOption = "horizontal";
+var isRunning = false;
 
 const wavePathButtons = document.querySelectorAll('input[name="wavepath"]');
 
@@ -97,9 +98,19 @@ for (const wavePathButton of wavePathButtons) {
 }
 
 audioPlayButton.addEventListener('click', (e) => {
+    if (isRunning) {
+        isRunning = !isRunning;
+        audioCtx.suspend();
+        audio.pause();
+        
+        return;
+    }
+    isRunning = !isRunning;
+    console.log(isRunning);
+    console.log(wavePathOption);
     audioCtx.resume();
     audio.play();
-    audioSource = audioCtx.createMediaElementSource(audio);
+    if (!audioSource) audioSource = audioCtx.createMediaElementSource(audio);
     audioAnalyser = audioCtx.createAnalyser();
     audioSource.connect(audioAnalyser);
     audioAnalyser.connect(audioCtx.destination);
@@ -118,16 +129,16 @@ audioPlayButton.addEventListener('click', (e) => {
     let barHeight;
     let x;
 
-    isRunning = !isRunning;
-
     function drawBase(displayOption) {
         if (displayOption === "circular") {
+            baseCanvasCtx.clearRect(0, 0, baseCanvas.width, baseCanvas.height);
             baseCanvasCtx.beginPath();
             baseCanvasCtx.lineWidth = 20;
             baseCanvasCtx.strokeStyle = '#40e0d0';
             baseCanvasCtx.arc(baseCanvas.width / 2, baseCanvas.height / 2, 190, 0, 2 * Math.PI);
             baseCanvasCtx.stroke();
         } else {
+            baseCanvasCtx.clearRect(0, 0, baseCanvas.width, baseCanvas.height);
             baseCanvasCtx.beginPath();
             baseCanvasCtx.lineWidth = 20;
             baseCanvasCtx.strokeStyle = '#40e0d0';
@@ -140,6 +151,7 @@ audioPlayButton.addEventListener('click', (e) => {
     function horizontalAnimate() {
         x = 0;
         audioCanvasCtx.clearRect(0, 0, audioCanvas.width, audioCanvas.height);
+        if (!isRunning) return;
         audioAnalyser.getByteFrequencyData(dataArray);
        
         for (let i = 0; i < bufferLength + dataArrayOffset; i++){
@@ -158,6 +170,7 @@ audioPlayButton.addEventListener('click', (e) => {
     function circularAnimate() {
         x = 0;        
         audioCanvasCtx.clearRect(0, 0, audioCanvas.width, audioCanvas.height);
+        if (!isRunning) return;
         audioAnalyser.getByteFrequencyData(dataArray);
 
         for (let i = 0; i < bufferLength + dataArrayOffset; i++){
