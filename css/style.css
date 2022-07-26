@@ -117,6 +117,15 @@
     height: 100%;
 }
 
+#timer-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 3;
+    width: 100%;
+    height: 100%;
+}
+
 #audio {
     width: 100%;
     margin-top: 4px;
@@ -135,9 +144,14 @@ button {
     margin-top: 4px;
 }
 
-button:active {
+button:enabled:active {
     transform: scale(0.95);
     box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
+}
+
+button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
 }
 
 .wavepath-radiobutton-container {
@@ -182,3 +196,21 @@ button:active {
 	width: 100%;
 }
 
+.title-input {
+    font-size: 1rem;
+    border-radius: 4rem;
+    margin: 0;
+    border: 3px solid var(--boston-blue-color);
+    outline: none;
+    padding: 4px 8px;
+    display: block;
+    width: 100%;
+}
+
+.title-input:focus {
+    border: 3px solid var(--blue-dianne-color);
+}
+
+.title-input:invalid {
+    border: 3px solid red;
+}

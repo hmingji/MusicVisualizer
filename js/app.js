@@ -1,6 +1,33 @@
 const audioFileDropzone = document.querySelector('.audiofile-dropzone');
 const audio = document.querySelector('#audio'); 
 const audioFileInput = document.querySelector('#audio-file');
+const titleInput = document.querySelector('.title-input');
+const audioPlayButton = document.querySelector('#audioplay-button');
+const audioCtx = new AudioContext();
+const audioCanvas = document.getElementById("audio-visualizer-canvas");
+const wavePathButtons = document.querySelectorAll('input[name="wavepath"]');
+
+/** @type {HTMLCanvasElement} */
+const baseCanvas = document.getElementById('base-canvas');
+/** @type {HTMLCanvasElement} */
+const timerCanvas = document.getElementById('timer-canvas');
+
+audioCanvas.height = window.innerHeight;
+audioCanvas.width = window.innerWidth;
+const audioCanvasCtx = audioCanvas.getContext('2d');
+
+baseCanvas.height = window.innerHeight;
+baseCanvas.width = window.innerWidth;
+const baseCanvasCtx = baseCanvas.getContext('2d');
+
+timerCanvas.height = window.innerHeight;
+timerCanvas.width = window.innerWidth;
+const timerCanvasCtx = timerCanvas.getContext('2d');
+
+let audioSource;
+let audioAnalyser;
+var wavePathOption = "horizontal";
+var isRunning = false;
 
 audioFileDropzone.addEventListener('dragenter', (e) => {
     e.preventDefault();
@@ -34,6 +61,7 @@ audioFileDropzone.addEventListener('drop', (e) => {
     //get the audio file and assign to the audio element
     audio.src = URL.createObjectURL(files[0]);
     audio.load();
+    audioPlayButton.disabled = false;
 })
 
 function isMultipleFiles(files) {
@@ -62,33 +90,11 @@ audioFileInput.addEventListener('change', (e) => {
     //get the audio file and assign to the audio element
     audio.src = URL.createObjectURL(files[0]);
     audio.load();
+    audioPlayButton.disabled = false;
 })
 
 document.addEventListener('dragover', (e) => e.preventDefault());
 document.addEventListener('drop', (e) => e.preventDefault());
-
-const audioCtx = new AudioContext();
-const audioCanvas = document.getElementById("audio-visualizer-canvas");
-
-/** @type {HTMLCanvasElement} */
-const baseCanvas = document.getElementById('base-canvas');
-
-const audioPlayButton = document.querySelector('#audioplay-button');
-
-audioCanvas.height = window.innerHeight;
-audioCanvas.width = window.innerWidth;
-const audioCanvasCtx = audioCanvas.getContext('2d');
-
-baseCanvas.height = window.innerHeight;
-baseCanvas.width = window.innerWidth;
-const baseCanvasCtx = baseCanvas.getContext('2d');
-
-let audioSource;
-let audioAnalyser;
-var wavePathOption = "horizontal";
-var isRunning = false;
-
-const wavePathButtons = document.querySelectorAll('input[name="wavepath"]');
 
 for (const wavePathButton of wavePathButtons) {
     wavePathButton.addEventListener('change', function(event){
@@ -106,8 +112,6 @@ audioPlayButton.addEventListener('click', (e) => {
         return;
     }
     isRunning = !isRunning;
-    console.log(isRunning);
-    console.log(wavePathOption);
     audioCtx.resume();
     audio.play();
     if (!audioSource) audioSource = audioCtx.createMediaElementSource(audio);
@@ -137,6 +141,12 @@ audioPlayButton.addEventListener('click', (e) => {
             baseCanvasCtx.strokeStyle = '#40e0d0';
             baseCanvasCtx.arc(baseCanvas.width / 2, baseCanvas.height / 2, 190, 0, 2 * Math.PI);
             baseCanvasCtx.stroke();
+
+            baseCanvasCtx.font = "4rem Inter";
+            baseCanvasCtx.fillStyle = '#40e0d0';
+            const title = titleInput.value;
+            baseCanvasCtx.fillText(title, baseCanvas.width*0.25/2, baseCanvas.height*0.25/2);
+
         } else {
             baseCanvasCtx.clearRect(0, 0, baseCanvas.width, baseCanvas.height);
             baseCanvasCtx.beginPath();
@@ -145,7 +155,34 @@ audioPlayButton.addEventListener('click', (e) => {
             baseCanvasCtx.moveTo(baseCanvas.width*0.25/2, baseCanvas.height - heightOffset - 20);
             baseCanvasCtx.lineTo(baseCanvas.width*(0.25/2+0.75), baseCanvas.height - heightOffset - 20);
             baseCanvasCtx.stroke();
+
+            baseCanvasCtx.font = "4rem Inter";
+            baseCanvasCtx.fillStyle = '#40e0d0';
+            const title = titleInput.value;
+            baseCanvasCtx.fillText(title, baseCanvas.width*0.25/2, baseCanvas.height*0.3);
         }
+    }
+
+    function formatTime(seconds) {
+        minutes = Math.floor(seconds / 60);
+        minutes = (minutes >= 10) ? minutes : "0" + minutes;
+        seconds = Math.floor(seconds % 60);
+        seconds = (seconds >= 10) ? seconds : "0" + seconds;
+        return minutes + ":" + seconds;
+      }
+
+    function horizontalAnimateTimer() {
+        timerCanvasCtx.clearRect(0, 0, timerCanvas.width, timerCanvas.height);
+        if (!isRunning) return;
+
+        timerCanvasCtx.fillStyle = '#40e0d0'
+        timerCanvasCtx.font = "4rem Inter";
+        timerCanvasCtx.fillText(formatTime(audio.currentTime), timerCanvas.width*(0.75), baseCanvas.height*0.75);
+
+        timerCanvasCtx.fillStyle = '#000000'
+        timerCanvasCtx.fillRect(timerCanvas.width*(0.25/2), baseCanvas.height - heightOffset - 20, timerCanvas.width*(0.75*audio.currentTime/audio.duration), 10);
+        
+        requestAnimationFrame(horizontalAnimateTimer);
     }
 
     function horizontalAnimate() {
@@ -193,6 +230,7 @@ audioPlayButton.addEventListener('click', (e) => {
     if (wavePathOption === "horizontal") {
         drawBase("horizontal");
         horizontalAnimate();
+        horizontalAnimateTimer();
         return;
     }
 
@@ -204,4 +242,5 @@ audioPlayButton.addEventListener('click', (e) => {
 
     return;
 })
+
 
