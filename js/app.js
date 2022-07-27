@@ -6,6 +6,9 @@ const audioPlayButton = document.querySelector('#audioplay-button');
 const audioCtx = new AudioContext();
 const audioCanvas = document.getElementById("audio-visualizer-canvas");
 const wavePathButtons = document.querySelectorAll('input[name="wavepath"]');
+const wordLengthSpan = document.getElementById('wordlength-span');
+const timerButtons = document.querySelectorAll('input[name=timer]');
+const timerOption = "enable";
 
 /** @type {HTMLCanvasElement} */
 const baseCanvas = document.getElementById('base-canvas');
@@ -102,6 +105,18 @@ for (const wavePathButton of wavePathButtons) {
         return;
     })
 }
+
+for (const timerButton of timerButtons) {
+    timerButton.addEventListener('change', function(event){
+        if (this.checked) timerOption = this.value;
+        return;
+    })
+}
+
+titleInput.addEventListener('input', function(event) {
+    wordLengthSpan.textContent = `${this.value.length} / 50`;
+    return; 
+})
 
 audioPlayButton.addEventListener('click', (e) => {
     if (isRunning) {
@@ -230,7 +245,7 @@ audioPlayButton.addEventListener('click', (e) => {
     if (wavePathOption === "horizontal") {
         drawBase("horizontal");
         horizontalAnimate();
-        horizontalAnimateTimer();
+        if (timerOption === "enable") horizontalAnimateTimer();
         return;
     }
 

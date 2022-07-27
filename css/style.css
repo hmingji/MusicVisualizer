@@ -154,7 +154,7 @@ button:disabled {
     opacity: 0.5;
 }
 
-.wavepath-radiobutton-container {
+.radiobutton-container {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -166,7 +166,7 @@ button:disabled {
     margin-bottom: 0.75rem;
 }
 
-.wavepath-radiobutton-container input {
+input[type=radio] {
     width: 50%;
     height: 100%;
 	-webkit-appearance: none;
@@ -182,14 +182,14 @@ button:disabled {
     transition: all 100ms linear;
 }
 
-.wavepath-radiobutton-container input:checked {
+input[type=radio]:checked {
 	background-color: var(--boston-blue-color);
 	color: #fff;
 	box-shadow: 0 1px 1px #0000002e;
 	text-shadow: 0 1px 0px #79485f7a;
 }
 
-.wavepath-radiobutton-container input:before {
+input[type=radio]:before {
 	content: attr(label);
 	display: inline-block;
 	text-align: center;
@@ -213,4 +213,12 @@ button:disabled {
 
 .title-input:invalid {
     border: 3px solid red;
+}
+
+#wordlength-span {
+    display: flex;
+    font-size: 0.75rem;
+    width: 100%;
+    justify-content: right;
+    margin-bottom: 4px;
 }
