@@ -45,7 +45,7 @@
     margin: 4px;
 }
 
-.audiofile-dropzone {
+.file-dropzone {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -61,11 +61,11 @@
     border: dashed 3px var(--blue-dianne-color);
 }
 
-.audio-file {
+.file {
     display: none;
 }
 
-.audio-file + label {
+.file + label {
     background-color: var(--boston-blue-color);
     border-radius: 4rem;
     color: white;
@@ -77,12 +77,12 @@
     margin-top: 0.75rem;
 }
 
-.audio-file:focus + label, 
-.audio-file + label:hover {
+.file:focus + label, 
+.file + label:hover {
     background-color: var(--blue-dianne-color);
 }
 
-.audiofile-dropzone h3 {
+.file-dropzone h3 {
     font-size: 1rem;
     margin-top: 0.25rem;
     text-align: center;

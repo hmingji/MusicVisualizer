@@ -21,9 +21,9 @@
             <div class="setting-container">
                 
                 <p>Audio File</p>
-                <div class="audiofile-dropzone">
+                <div class="file-dropzone audiofile">
                     <i class="fa-solid fa-upload fa-2x"></i>
-                    <input type="file" class="audio-file" id="audio-file" accept="audio/mp3, audio/wav" />
+                    <input type="file" class="file" id="audio-file" accept="audio/mp3, audio/wav" />
                     <label for="audio-file">Choose only one audio file</label>
                     <h3>or drag & drop your mp3 or wav file here</h3>
                 </div>
@@ -42,6 +42,14 @@
                 <div class="radiobutton-container">
                     <input label="Enable" type="radio" name="timer" value="enable" checked>
                     <input label="Disable" type="radio" name="timer" value="disable">
+                </div>
+                
+                <p>Lyrics</p>
+                <div class="file-dropzone lyricsfile">
+                    <i class="fa-solid fa-upload fa-2x"></i>
+                    <input type="file" class="file" id="lyrics-file" accept="audio/mp3, audio/wav" />
+                    <label for="lyrics-file">Choose srt file to upload</label>
+                    <h3>or drag & drop your file here</h3>
                 </div>
 
                 <button id="audioplay-button" disabled="true">Play</button>

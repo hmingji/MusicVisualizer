@@ -1,6 +1,8 @@
-const audioFileDropzone = document.querySelector('.audiofile-dropzone');
+const audioFileDropzone = document.querySelector('.file-dropzone.audiofile');
+const lyricsFileDropzone = document.querySelector('.file-dropzone.lyricsfile');
 const audio = document.querySelector('#audio'); 
 const audioFileInput = document.querySelector('#audio-file');
+const lyricsFileInput = document.querySelector('#lyrics-file');
 const titleInput = document.querySelector('.title-input');
 const audioPlayButton = document.querySelector('#audioplay-button');
 const audioCtx = new AudioContext();
@@ -9,6 +11,7 @@ const wavePathButtons = document.querySelectorAll('input[name="wavepath"]');
 const wordLengthSpan = document.getElementById('wordlength-span');
 const timerButtons = document.querySelectorAll('input[name=timer]');
 const timerOption = "enable";
+var subtitleObjs;
 
 /** @type {HTMLCanvasElement} */
 const baseCanvas = document.getElementById('base-canvas');
@@ -34,22 +37,22 @@ var isRunning = false;
 
 audioFileDropzone.addEventListener('dragenter', (e) => {
     e.preventDefault();
-    setActive(audioFileDropzone);
+    setActive(e.currentTarget);
 })
 
 audioFileDropzone.addEventListener('dragover', (e) => {
     e.preventDefault();
-    setActive(audioFileDropzone);
+    setActive(e.currentTarget);
 })
 
 audioFileDropzone.addEventListener('dragleave', (e) => {
     e.preventDefault();
-    setActive(audioFileDropzone, false);
+    setActive(e.currentTarget, false);
 })
 
 audioFileDropzone.addEventListener('drop', (e) => {
     e.preventDefault();
-    setActive(audioFileDropzone, false);
+    setActive(e.currentTarget, false);
 
     const { files } = e.dataTransfer;
     
@@ -57,7 +60,7 @@ audioFileDropzone.addEventListener('drop', (e) => {
         return alert("Only one audio file to be uploaded.");
     }  
     
-    if (!isCorrectFileType(files)){
+    if (!isCorrectFileType(files, ["audio/mpeg", "audio/wav"])){
         return alert("File type uploaded is not correct.")
     } 
 
@@ -67,15 +70,51 @@ audioFileDropzone.addEventListener('drop', (e) => {
     audioPlayButton.disabled = false;
 })
 
+lyricsFileDropzone.addEventListener('dragenter', (e) => {
+    e.preventDefault();
+    setActive(e.currentTarget);
+})
+
+lyricsFileDropzone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    setActive(e.currentTarget);
+})
+
+lyricsFileDropzone.addEventListener('dragleave', (e) => {
+    e.preventDefault();
+    setActive(e.currentTarget, false);
+})
+
+lyricsFileDropzone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    setActive(e.currentTarget, false);
+
+    const { files } = e.dataTransfer;
+    
+    if (isMultipleFiles(files)) {
+        return alert("Only one audio file to be uploaded.");
+    }  
+    
+    files[0].text().then((result) => {
+        subtitleObjs = PF_SRT.parse(result);
+        if (subtitleObjs.length == 0) alert("Unable to read the file.");
+    }).catch((error) => {
+        console.log(error);
+    });   
+})
+
 function isMultipleFiles(files) {
     if (files.length > 1) return true;
     return false;
 }
 
-function isCorrectFileType(files) {
+function isCorrectFileType(files, filetypes) {
     return [...files].every((file) => {
-        //console.log(file.type);
-        return file.type === "audio/mpeg" || file.type === "audio/wav"
+        console.log(file);
+        for (const filetype of filetypes) {
+            if (file.type === filetype) return true;
+        }
+        return false;
     });
 }
 
@@ -86,7 +125,7 @@ audioFileInput.addEventListener('change', (e) => {
         return alert("Only one audio file to be uploaded.");
     }  
     
-    if (!isCorrectFileType(files)){
+    if (!isCorrectFileType(files, ["audio/mpeg", "audio/wav"])){
         return alert("File type uploaded is not correct.")
     } 
 
@@ -95,6 +134,22 @@ audioFileInput.addEventListener('change', (e) => {
     audio.load();
     audioPlayButton.disabled = false;
 })
+
+lyricsFileInput.addEventListener('change', (e) => {
+    const { files } = e.target;
+
+    if (isMultipleFiles(files)) {
+        return alert("Only one file to be uploaded.");
+    }  
+    
+    files[0].text().then((result) => {
+        subtitleObjs = PF_SRT.parse(result);
+        if (subtitleObjs.length == 0) alert("Unable to read the file.");
+    }).catch((error) => {
+        console.log(error);
+    });  
+})
+
 
 document.addEventListener('dragover', (e) => e.preventDefault());
 document.addEventListener('drop', (e) => e.preventDefault());
@@ -189,11 +244,18 @@ audioPlayButton.addEventListener('click', (e) => {
     function horizontalAnimateTimer() {
         timerCanvasCtx.clearRect(0, 0, timerCanvas.width, timerCanvas.height);
         if (!isRunning) return;
+        //check subtitle and fill text, check subtitle text having breakline case, need to include
 
         timerCanvasCtx.fillStyle = '#40e0d0'
         timerCanvasCtx.font = "4rem Inter";
         timerCanvasCtx.fillText(formatTime(audio.currentTime), timerCanvas.width*(0.75), baseCanvas.height*0.75);
 
+        subtitleObjs.forEach((sub) => {
+            const startInSeconds = convertTimecodeIntoSeconds(sub.startTime);
+            const endInSeconds = convertTimecodeIntoSeconds(sub.endTime);
+            if (audio.currentTime > startInSeconds && audio.currentTime < endInSeconds) timerCanvasCtx.fillText(sub.text, timerCanvas.width*(0.25/2), baseCanvas.height*0.5 );
+        });
+        
         timerCanvasCtx.fillStyle = '#000000'
         timerCanvasCtx.fillRect(timerCanvas.width*(0.25/2), baseCanvas.height - heightOffset - 20, timerCanvas.width*(0.75*audio.currentTime/audio.duration), 10);
         
