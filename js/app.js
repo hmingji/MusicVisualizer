@@ -1,8 +1,10 @@
 const audioFileDropzone = document.querySelector('.file-dropzone.audiofile');
 const lyricsFileDropzone = document.querySelector('.file-dropzone.lyricsfile');
+const imageFileDropzone = document.querySelector('.file-dropzone.imagefile');
 const audio = document.querySelector('#audio'); 
 const audioFileInput = document.querySelector('#audio-file');
 const lyricsFileInput = document.querySelector('#lyrics-file');
+const imageFileInput = document.querySelector('#image-file');
 const titleInput = document.querySelector('.title-input');
 const audioPlayButton = document.querySelector('#audioplay-button');
 const audioCtx = new AudioContext();
@@ -12,6 +14,7 @@ const wordLengthSpan = document.getElementById('wordlength-span');
 const timerButtons = document.querySelectorAll('input[name=timer]');
 const timerOption = "enable";
 var subtitleObjs;
+var image = new Image();
 
 /** @type {HTMLCanvasElement} */
 const baseCanvas = document.getElementById('base-canvas');
@@ -101,6 +104,38 @@ lyricsFileDropzone.addEventListener('drop', (e) => {
     }).catch((error) => {
         console.log(error);
     });   
+})
+
+imageFileDropzone.addEventListener('dragenter', (e) => {
+    e.preventDefault();
+    setActive(e.currentTarget);
+})
+
+imageFileDropzone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    setActive(e.currentTarget);
+})
+
+imageFileDropzone.addEventListener('dragleave', (e) => {
+    e.preventDefault();
+    setActive(e.currentTarget, false);
+})
+
+imageFileDropzone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    setActive(e.currentTarget, false);
+
+    const { files } = e.dataTransfer;
+    
+    if (isMultipleFiles(files)) {
+        return alert("Only one audio file to be uploaded.");
+    }  
+    
+    if (!isCorrectFileType(files, ["image/jpeg", "image/png"])){
+        return alert("File type uploaded is not correct.")
+    } 
+
+    image.src = URL.createObjectURL(files[0]);
 })
 
 function isMultipleFiles(files) {
@@ -206,6 +241,7 @@ audioPlayButton.addEventListener('click', (e) => {
     function drawBase(displayOption) {
         if (displayOption === "circular") {
             baseCanvasCtx.clearRect(0, 0, baseCanvas.width, baseCanvas.height);
+            if (image.src) baseCanvasCtx.drawImage(image, 0, 0, baseCanvas.width, baseCanvas.height);
             baseCanvasCtx.beginPath();
             baseCanvasCtx.lineWidth = 20;
             baseCanvasCtx.strokeStyle = '#40e0d0';
@@ -216,9 +252,10 @@ audioPlayButton.addEventListener('click', (e) => {
             baseCanvasCtx.fillStyle = '#40e0d0';
             const title = titleInput.value;
             baseCanvasCtx.fillText(title, baseCanvas.width*0.25/2, baseCanvas.height*0.25/2);
-
+            
         } else {
             baseCanvasCtx.clearRect(0, 0, baseCanvas.width, baseCanvas.height);
+            if (image.src) baseCanvasCtx.drawImage(image, 0, 0, baseCanvas.width, baseCanvas.height);
             baseCanvasCtx.beginPath();
             baseCanvasCtx.lineWidth = 20;
             baseCanvasCtx.strokeStyle = '#40e0d0';
@@ -229,7 +266,7 @@ audioPlayButton.addEventListener('click', (e) => {
             baseCanvasCtx.font = "4rem Inter";
             baseCanvasCtx.fillStyle = '#40e0d0';
             const title = titleInput.value;
-            baseCanvasCtx.fillText(title, baseCanvas.width*0.25/2, baseCanvas.height*0.3);
+            baseCanvasCtx.fillText(title, baseCanvas.width*0.25/2, baseCanvas.height*0.3);   
         }
     }
 
@@ -244,18 +281,20 @@ audioPlayButton.addEventListener('click', (e) => {
     function horizontalAnimateTimer() {
         timerCanvasCtx.clearRect(0, 0, timerCanvas.width, timerCanvas.height);
         if (!isRunning) return;
-        //check subtitle and fill text, check subtitle text having breakline case, need to include
 
         timerCanvasCtx.fillStyle = '#40e0d0'
         timerCanvasCtx.font = "4rem Inter";
         timerCanvasCtx.fillText(formatTime(audio.currentTime), timerCanvas.width*(0.75), baseCanvas.height*0.75);
-
-        subtitleObjs.forEach((sub) => {
-            const startInSeconds = convertTimecodeIntoSeconds(sub.startTime);
-            const endInSeconds = convertTimecodeIntoSeconds(sub.endTime);
-            if (audio.currentTime > startInSeconds && audio.currentTime < endInSeconds) timerCanvasCtx.fillText(sub.text, timerCanvas.width*(0.25/2), baseCanvas.height*0.5 );
-        });
         
+        timerCanvasCtx.font = "2rem Inter";
+        if (subtitleObjs) {
+            subtitleObjs.forEach((sub) => {
+                const startInSeconds = convertTimecodeIntoSeconds(sub.startTime);
+                const endInSeconds = convertTimecodeIntoSeconds(sub.endTime);
+                if (audio.currentTime > startInSeconds && audio.currentTime < endInSeconds) timerCanvasCtx.fillText(sub.text, timerCanvas.width*(0.25/2), baseCanvas.height*0.5 );
+            });
+        }
+
         timerCanvasCtx.fillStyle = '#000000'
         timerCanvasCtx.fillRect(timerCanvas.width*(0.25/2), baseCanvas.height - heightOffset - 20, timerCanvas.width*(0.75*audio.currentTime/audio.duration), 10);
         

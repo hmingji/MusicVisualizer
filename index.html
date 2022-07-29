@@ -26,6 +26,7 @@
                     <input type="file" class="file" id="audio-file" accept="audio/mp3, audio/wav" />
                     <label for="audio-file">Choose only one audio file</label>
                     <h3>or drag & drop your mp3 or wav file here</h3>
+                    <!-- todo: indicate the file uploaded-->
                 </div>
                 
                 <p>Title</p>
@@ -47,12 +48,22 @@
                 <p>Lyrics</p>
                 <div class="file-dropzone lyricsfile">
                     <i class="fa-solid fa-upload fa-2x"></i>
-                    <input type="file" class="file" id="lyrics-file" accept="audio/mp3, audio/wav" />
+                    <input type="file" class="file" id="lyrics-file" />
                     <label for="lyrics-file">Choose srt file to upload</label>
                     <h3>or drag & drop your file here</h3>
                 </div>
 
+                <!-- background image-->
+                <p>Background Image</p>
+                <div class="file-dropzone imagefile">
+                    <i class="fa-solid fa-upload fa-2x"></i>
+                    <input type="file" class="file" id="image-file" />
+                    <label for="image-file">Choose image file to upload</label>
+                    <h3>or drag & drop your file here</h3>
+                </div>
+
                 <button id="audioplay-button" disabled="true">Play</button>
+                <!-- to add pause button, reset button, download video button-->
 
             </div>
 

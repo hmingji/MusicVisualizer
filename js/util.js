@@ -12,7 +12,7 @@ function setActive(dropzone, active = true) {
 
 var PF_SRT = (function () {
     var pattern =
-      /(\d+)\n([\d:,]+)\s+-{2}\>\s+([\d:,]+)\n([\s\S]*?(?=\n{2}|$))/gm;
+      /(\d+)\n([\d:,]+)\s+-{2}\>\s+([\d:,]+)\n([\s\S]*?(?=\n\d+$|EndOfString))/gm;
     var _regExp;
   
     var init = function () {
@@ -26,10 +26,12 @@ var PF_SRT = (function () {
       if (f == null) return result;
   
       f = f.replace(/\r\n|\r|\n/g, "\n");
-  
+      f = f.concat("EndOfString");
+      
       while ((matches = pattern.exec(f)) != null) {
         result.push(toLineObj(matches));
       }
+
       return result;
     };
   
