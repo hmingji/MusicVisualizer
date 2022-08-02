@@ -103,7 +103,7 @@
     width: 100%;
     height: 100%;
     z-index: 2;
-    filter: url('#goo');
+    /*filter: url('#goo');
     /*filter: blur(3px) contrast(100);*/
     /* min height or min width to be defined */
 }
@@ -122,6 +122,15 @@
     top: 0;
     left: 0;
     z-index: 3;
+    width: 100%;
+    height: 100%;
+}
+
+#export-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 4;
     width: 100%;
     height: 100%;
 }

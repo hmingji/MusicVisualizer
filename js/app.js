@@ -7,8 +7,8 @@ const lyricsFileInput = document.querySelector('#lyrics-file');
 const imageFileInput = document.querySelector('#image-file');
 const titleInput = document.querySelector('.title-input');
 const audioPlayButton = document.querySelector('#audioplay-button');
+const exportButton = document.querySelector('#export-button');
 const audioCtx = new AudioContext();
-const audioCanvas = document.getElementById("audio-visualizer-canvas");
 const wavePathButtons = document.querySelectorAll('input[name="wavepath"]');
 const wordLengthSpan = document.getElementById('wordlength-span');
 const timerButtons = document.querySelectorAll('input[name=timer]');
@@ -20,6 +20,10 @@ var image = new Image();
 const baseCanvas = document.getElementById('base-canvas');
 /** @type {HTMLCanvasElement} */
 const timerCanvas = document.getElementById('timer-canvas');
+/** @type {HTMLCanvasElement} */
+const audioCanvas = document.getElementById("audio-visualizer-canvas");
+/** @type {HTMLCanvasElement} */
+const exportCanvas = document.getElementById("export-canvas");
 
 audioCanvas.height = window.innerHeight;
 audioCanvas.width = window.innerWidth;
@@ -32,6 +36,10 @@ const baseCanvasCtx = baseCanvas.getContext('2d');
 timerCanvas.height = window.innerHeight;
 timerCanvas.width = window.innerWidth;
 const timerCanvasCtx = timerCanvas.getContext('2d');
+
+exportCanvas.height = window.innerHeight;
+exportCanvas.width = window.innerWidth;
+const exportCanvasCtx = exportCanvas.getContext('2d');
 
 let audioSource;
 let audioAnalyser;
@@ -208,6 +216,7 @@ titleInput.addEventListener('input', function(event) {
     return; 
 })
 
+
 audioPlayButton.addEventListener('click', (e) => {
     if (isRunning) {
         isRunning = !isRunning;
@@ -359,4 +368,57 @@ audioPlayButton.addEventListener('click', (e) => {
     return;
 })
 
+function record(canvas, time) {
+    var recordedChunks = [];
+    return new Promise(function (res, rej) {
+        var stream = canvas.captureStream(25 /*fps*/);
+        mediaRecorder = new MediaRecorder(stream, {
+            mimeType: "video/webm; codecs=vp9"
+        });
+        
+        //ondataavailable will fire in interval of `time || 4000 ms`
+        mediaRecorder.start(time || 4000);
 
+        mediaRecorder.ondataavailable = function (event) {
+            recordedChunks.push(event.data);
+             // after stop `dataavilable` event run one more time
+            if (mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+            }
+
+        }
+
+        mediaRecorder.onstop = function (event) {
+            var blob = new Blob(recordedChunks, {type: "video/webm" });
+            var url = URL.createObjectURL(blob);
+            res(url);
+        }
+    })
+}
+
+exportButton.addEventListener('click', (e) => {
+    //to start the play procedure, need to be optimized afterwards
+    audioPlayButton.click();
+
+    function exportCanvasAnimate() {
+        exportCanvasCtx.clearRect(0, 0, exportCanvas.width, exportCanvas.height);
+        if(!isRunning) return;
+
+        exportCanvasCtx.drawImage(baseCanvas, 0, 0);
+        exportCanvasCtx.drawImage(audioCanvas, 0, 0);
+        exportCanvasCtx.drawImage(timerCanvas, 0, 0);
+
+        requestAnimationFrame(exportCanvasAnimate);
+    }
+
+    exportCanvasAnimate();
+
+    const recording = record(exportCanvas, 10000);
+    let link$ = document.createElement('a');
+    link$.setAtribute('download','recordingVideo');
+    recording.then(url => {
+        link$.setAttribute('href', url);
+        link$.click();
+    })
+
+})
