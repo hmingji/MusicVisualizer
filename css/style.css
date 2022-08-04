@@ -50,7 +50,6 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-
     border: dashed 3px var(--boston-blue-color);
     border-radius: 1rem;
     padding: 1rem;
@@ -93,7 +92,6 @@
     position: relative;
     width: 100%;
     height: 80%;
-    /*border: solid 1px black;*/
 }
 
 #audio-visualizer-canvas {
@@ -103,8 +101,7 @@
     width: 100%;
     height: 100%;
     z-index: 2;
-    /*filter: url('#goo');
-    /*filter: blur(3px) contrast(100);*/
+    filter: url('#goo');
     /* min height or min width to be defined */
 }
 
@@ -126,14 +123,6 @@
     height: 100%;
 }
 
-#export-canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 4;
-    width: 100%;
-    height: 100%;
-}
 
 #audio {
     width: 100%;
@@ -185,7 +174,6 @@ input[type=radio] {
 	cursor: pointer;
 	border-radius: 4rem;
 	padding: 4px 8px;
-	/*background: #454857;*/
 	color: #bdbdbdbd;
 	font-size: 1rem;
     transition: all 100ms linear;
@@ -231,3 +219,34 @@ input[type=radio]:before {
     justify-content: right;
     margin-bottom: 4px;
 }
+
+.chip {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 12px;
+    font-size: 1rem;
+    color: white;
+    border-radius: 4rem;
+    background-color: var(--boston-blue-color);
+    width: 100%;
+    margin-bottom: 8px;
+    margin-top: 4px;
+}
+
+.closebtn {
+    color: white;
+    font-weight: bold;
+    float: right;
+    font-size: 1rem;
+    cursor: pointer;
+}
+  
+.closebtn:hover {
+    color: #000;
+}
+
+h6 {
+    margin-top: 10px;
+}
+
+/* add dynamic display based on media device */

@@ -1,6 +1,7 @@
 const audioFileDropzone = document.querySelector('.file-dropzone.audiofile');
 const lyricsFileDropzone = document.querySelector('.file-dropzone.lyricsfile');
 const imageFileDropzone = document.querySelector('.file-dropzone.imagefile');
+const canvasContainer = document.querySelector('.canvas-container');
 const audio = document.querySelector('#audio'); 
 const audioFileInput = document.querySelector('#audio-file');
 const lyricsFileInput = document.querySelector('#lyrics-file');
@@ -8,6 +9,7 @@ const imageFileInput = document.querySelector('#image-file');
 const titleInput = document.querySelector('.title-input');
 const audioPlayButton = document.querySelector('#audioplay-button');
 const exportButton = document.querySelector('#export-button');
+const resetButton = document.querySelector('#reset-button');
 const audioCtx = new AudioContext();
 const wavePathButtons = document.querySelectorAll('input[name="wavepath"]');
 const wordLengthSpan = document.getElementById('wordlength-span');
@@ -22,8 +24,6 @@ const baseCanvas = document.getElementById('base-canvas');
 const timerCanvas = document.getElementById('timer-canvas');
 /** @type {HTMLCanvasElement} */
 const audioCanvas = document.getElementById("audio-visualizer-canvas");
-/** @type {HTMLCanvasElement} */
-const exportCanvas = document.getElementById("export-canvas");
 
 audioCanvas.height = window.innerHeight;
 audioCanvas.width = window.innerWidth;
@@ -36,10 +36,6 @@ const baseCanvasCtx = baseCanvas.getContext('2d');
 timerCanvas.height = window.innerHeight;
 timerCanvas.width = window.innerWidth;
 const timerCanvasCtx = timerCanvas.getContext('2d');
-
-exportCanvas.height = window.innerHeight;
-exportCanvas.width = window.innerWidth;
-const exportCanvasCtx = exportCanvas.getContext('2d');
 
 let audioSource;
 let audioAnalyser;
@@ -61,7 +57,7 @@ audioFileDropzone.addEventListener('dragleave', (e) => {
     setActive(e.currentTarget, false);
 })
 
-audioFileDropzone.addEventListener('drop', (e) => {
+audioFileDropzone.addEventListener('drop', function(e) {
     e.preventDefault();
     setActive(e.currentTarget, false);
 
@@ -79,6 +75,11 @@ audioFileDropzone.addEventListener('drop', (e) => {
     audio.src = URL.createObjectURL(files[0]);
     audio.load();
     audioPlayButton.disabled = false;
+    exportButton.disabled = false;
+    resetButton.disabled = false;
+
+    this.style.display = 'none';
+    displayFileChip(files[0], this.nextElementSibling, "audio");
 })
 
 lyricsFileDropzone.addEventListener('dragenter', (e) => {
@@ -96,7 +97,7 @@ lyricsFileDropzone.addEventListener('dragleave', (e) => {
     setActive(e.currentTarget, false);
 })
 
-lyricsFileDropzone.addEventListener('drop', (e) => {
+lyricsFileDropzone.addEventListener('drop', function(e) {
     e.preventDefault();
     setActive(e.currentTarget, false);
 
@@ -111,7 +112,10 @@ lyricsFileDropzone.addEventListener('drop', (e) => {
         if (subtitleObjs.length == 0) alert("Unable to read the file.");
     }).catch((error) => {
         console.log(error);
-    });   
+    });
+    
+    this.style.display = 'none';
+    displayFileChip(files[0], this.nextElementSibling, "lyrics");
 })
 
 imageFileDropzone.addEventListener('dragenter', (e) => {
@@ -129,14 +133,14 @@ imageFileDropzone.addEventListener('dragleave', (e) => {
     setActive(e.currentTarget, false);
 })
 
-imageFileDropzone.addEventListener('drop', (e) => {
+imageFileDropzone.addEventListener('drop', function(e) {
     e.preventDefault();
     setActive(e.currentTarget, false);
 
     const { files } = e.dataTransfer;
     
     if (isMultipleFiles(files)) {
-        return alert("Only one audio file to be uploaded.");
+        return alert("Only one image file to be uploaded.");
     }  
     
     if (!isCorrectFileType(files, ["image/jpeg", "image/png"])){
@@ -144,6 +148,9 @@ imageFileDropzone.addEventListener('drop', (e) => {
     } 
 
     image.src = URL.createObjectURL(files[0]);
+
+    this.style.display = 'none';
+    displayFileChip(files[0], this.nextElementSibling, "image");
 })
 
 function isMultipleFiles(files) {
@@ -153,7 +160,6 @@ function isMultipleFiles(files) {
 
 function isCorrectFileType(files, filetypes) {
     return [...files].every((file) => {
-        console.log(file);
         for (const filetype of filetypes) {
             if (file.type === filetype) return true;
         }
@@ -161,7 +167,7 @@ function isCorrectFileType(files, filetypes) {
     });
 }
 
-audioFileInput.addEventListener('change', (e) => {
+audioFileInput.addEventListener('change', function(e) {
     const { files } = e.target;
 
     if (isMultipleFiles(files)) {
@@ -176,9 +182,15 @@ audioFileInput.addEventListener('change', (e) => {
     audio.src = URL.createObjectURL(files[0]);
     audio.load();
     audioPlayButton.disabled = false;
+    exportButton.disabled = false;
+    resetButton.disabled = false;
+    
+    this.parentElement.style.display = 'none';
+    displayFileChip(files[0], this.parentElement.nextElementSibling, "audio");
+    this.value = '';
 })
 
-lyricsFileInput.addEventListener('change', (e) => {
+lyricsFileInput.addEventListener('change', function(e) {
     const { files } = e.target;
 
     if (isMultipleFiles(files)) {
@@ -190,9 +202,30 @@ lyricsFileInput.addEventListener('change', (e) => {
         if (subtitleObjs.length == 0) alert("Unable to read the file.");
     }).catch((error) => {
         console.log(error);
-    });  
+    });
+
+    this.parentElement.style.display = 'none';
+    displayFileChip(files[0], this.parentElement.nextElementSibling, "lyrics");
+    this.value = '';
 })
 
+imageFileInput.addEventListener('change', function(e) {
+    const { files } = e.target;
+    
+    if (isMultipleFiles(files)) {
+        return alert("Only one image file to be uploaded.");
+    }  
+    
+    if (!isCorrectFileType(files, ["image/jpeg", "image/png"])){
+        return alert("File type uploaded is not correct.")
+    } 
+
+    image.src = URL.createObjectURL(files[0]);
+
+    this.parentElement.style.display = 'none';
+    displayFileChip(files[0], this.parentElement.nextElementSibling, "image");
+    this.value = '';
+})
 
 document.addEventListener('dragover', (e) => e.preventDefault());
 document.addEventListener('drop', (e) => e.preventDefault());
@@ -211,6 +244,11 @@ for (const timerButton of timerButtons) {
     })
 }
 
+audio.addEventListener('ended', (e) => {
+    isRunning = false;
+    return;
+})
+
 titleInput.addEventListener('input', function(event) {
     wordLengthSpan.textContent = `${this.value.length} / 50`;
     return; 
@@ -228,6 +266,8 @@ audioPlayButton.addEventListener('click', (e) => {
     isRunning = !isRunning;
     audioCtx.resume();
     audio.play();
+    //todo: auto scroll to preview session if scrollable
+
     if (!audioSource) audioSource = audioCtx.createMediaElementSource(audio);
     audioAnalyser = audioCtx.createAnalyser();
     audioSource.connect(audioAnalyser);
@@ -368,24 +408,22 @@ audioPlayButton.addEventListener('click', (e) => {
     return;
 })
 
-function record(canvas, time) {
+function record(stream, time) {
     var recordedChunks = [];
     return new Promise(function (res, rej) {
-        var stream = canvas.captureStream(25 /*fps*/);
         mediaRecorder = new MediaRecorder(stream, {
             mimeType: "video/webm; codecs=vp9"
         });
-        
+
         //ondataavailable will fire in interval of `time || 4000 ms`
         mediaRecorder.start(time || 4000);
 
         mediaRecorder.ondataavailable = function (event) {
             recordedChunks.push(event.data);
-             // after stop `dataavilable` event run one more time
-            if (mediaRecorder.state === 'recording') {
+
+            if (!isRunning) {
                 mediaRecorder.stop();
             }
-
         }
 
         mediaRecorder.onstop = function (event) {
@@ -396,29 +434,91 @@ function record(canvas, time) {
     })
 }
 
-exportButton.addEventListener('click', (e) => {
-    //to start the play procedure, need to be optimized afterwards
-    audioPlayButton.click();
-
-    function exportCanvasAnimate() {
-        exportCanvasCtx.clearRect(0, 0, exportCanvas.width, exportCanvas.height);
-        if(!isRunning) return;
-
-        exportCanvasCtx.drawImage(baseCanvas, 0, 0);
-        exportCanvasCtx.drawImage(audioCanvas, 0, 0);
-        exportCanvasCtx.drawImage(timerCanvas, 0, 0);
-
-        requestAnimationFrame(exportCanvasAnimate);
+exportButton.addEventListener('click', async (e) => {
+    if (!("CropTarget" in self && "fromElement" in CropTarget)) {
+        return alert("Export is not supported by current browser used. Please use chrome 104 or above.");
     }
+    const cropTarget = await CropTarget.fromElement(canvasContainer);
 
-    exportCanvasAnimate();
+    //auto rewind the audio back to starting point
+    //disable all control on the webpage
+    const stream = await navigator.mediaDevices.getDisplayMedia({
+        preferCurrentTab: true,
+        audio: true,
+        video: true
+    });
 
-    const recording = record(exportCanvas, 10000);
+    const [videoTrack] = stream.getVideoTracks();
+    await videoTrack.cropTo(cropTarget);
+    audioPlayButton.click();
+    const mediaStreamAudioDestinationNode = new MediaStreamAudioDestinationNode(audioCtx);
+    stream.addTrack(mediaStreamAudioDestinationNode.stream.getAudioTracks()[0]);
+
+    const recording = record(stream, 10000);
+
     let link$ = document.createElement('a');
-    link$.setAtribute('download','recordingVideo');
+    link$.setAttribute('download','music_visual');
     recording.then(url => {
         link$.setAttribute('href', url);
         link$.click();
     })
 
+    //enable all control on the webpage
+})
+
+function displayFileChip(file, displayElement, fileType) {
+    const div = document.createElement('div');
+    div.classList.add('chip');
+    div.innerHTML = `
+        <div style="display: flex; align-items: center;">
+            <i class="fa-solid fa-file"></i>
+            <p style="padding-left: 4px">${truncate(file.name, 15)}</p>
+        </div>
+        <span class="closebtn ${fileType}">&times;</span>
+    `;
+    
+    displayElement.appendChild(div);
+
+    const spanElement = document.querySelector(`.closebtn.${fileType}`);
+    spanElement.addEventListener('click', function() {
+        this.parentElement.parentElement.previousElementSibling.style.display = 'flex';
+        const elementToRemove = this.parentElement;
+        elementToRemove.parentElement.removeChild(elementToRemove);
+        removeFile(fileType);
+    })
+}
+
+function removeFile(fileType) {
+    switch (fileType) {
+        case "audio":
+            if (audio.src) URL.revokeObjectURL(audio.src);
+            audio.src = '';
+            audioPlayButton.disabled = true;
+            exportButton.disabled = true;
+            resetButton.disabled = true;
+            break;
+        case "image":
+            if (image.src) URL.revokeObjectURL(image.src);
+            image.src = '';
+            break;
+        case "lyrics":
+            subtitleObjs = [];
+            break;
+        default:
+            break;
+    }
+}
+
+function truncate(str, n){
+    const strArr = str.split('.');
+    return (str.length > n) ? str.slice(0, n-1) + '&hellip;' + strArr[strArr.length - 1] : str;
+};
+
+resetButton.addEventListener('click', function(e) {
+    const chipElements = document.querySelectorAll(".chip");
+    const fileDropElements = document.querySelectorAll(".file-dropzone");
+
+    ["audio", "image", "lyrics"].forEach((item) => removeFile(item));
+    chipElements.forEach((item) => item.parentElement.removeChild(item));
+    fileDropElements.forEach((item) => item.style.display = 'flex');
 })
