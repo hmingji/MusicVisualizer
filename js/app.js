@@ -10,6 +10,7 @@ const titleInput = document.querySelector('.title-input');
 const audioPlayButton = document.querySelector('#audioplay-button');
 const exportButton = document.querySelector('#export-button');
 const resetButton = document.querySelector('#reset-button');
+const previewSession = document.querySelector('.preview-container');
 const backdrops = document.querySelectorAll('.backdrop');
 const audioCtx = new AudioContext();
 const wavePathButtons = document.querySelectorAll('input[name="wavepath"]');
@@ -18,6 +19,22 @@ const timerButtons = document.querySelectorAll('input[name=timer]');
 const timerOption = "enable";
 var subtitleObjs;
 var image = new Image();
+var fontSize_main;
+var fontSize_secondary;
+
+function checkFontSize(mediaQuery) {
+    if (mediaQuery.matches) {
+        fontSize_main = 4;
+        fontSize_secondary = 2;
+    } else {
+        fontSize_main = 2;
+        fontSize_secondary = 1;
+    }
+}
+
+var mediaQuery = window.matchMedia("(min-width: 965px)");
+checkFontSize(mediaQuery);
+mediaQuery.addListener(checkFontSize);
 
 /** @type {HTMLCanvasElement} */
 const baseCanvas = document.getElementById('base-canvas');
@@ -42,6 +59,16 @@ let audioSource;
 let audioAnalyser;
 var wavePathOption = "horizontal";
 var isRunning = false;
+
+audio.addEventListener('play', (e) => {
+    isRunning = true;
+    audioPlayButton.textContent = 'Pause';
+})
+
+audio.addEventListener('pause', (e) => {
+    isRunning = false;
+    audioPlayButton.textContent = 'Play';
+})
 
 audioFileDropzone.addEventListener('dragenter', (e) => {
     e.preventDefault();
@@ -153,20 +180,6 @@ imageFileDropzone.addEventListener('drop', function(e) {
     displayFileChip(files[0], this.nextElementSibling, "image");
 })
 
-function isMultipleFiles(files) {
-    if (files.length > 1) return true;
-    return false;
-}
-
-function isCorrectFileType(files, filetypes) {
-    return [...files].every((file) => {
-        for (const filetype of filetypes) {
-            if (file.type === filetype) return true;
-        }
-        return false;
-    });
-}
-
 audioFileInput.addEventListener('change', function(e) {
     const { files } = e.target;
 
@@ -253,7 +266,6 @@ titleInput.addEventListener('input', function(event) {
     return; 
 })
 
-
 audioPlayButton.addEventListener('click', (e) => {
     if (isRunning) {
         isRunning = !isRunning;
@@ -265,8 +277,8 @@ audioPlayButton.addEventListener('click', (e) => {
     isRunning = !isRunning;
     audioCtx.resume();
     audio.play();
-    //todo: auto scroll to preview session if scrollable
 
+    previewSession.scrollIntoView({ behavior: "smooth", block: "end" });
     if (!audioSource) audioSource = audioCtx.createMediaElementSource(audio);
     audioAnalyser = audioCtx.createAnalyser();
     audioSource.connect(audioAnalyser);
@@ -298,7 +310,7 @@ audioPlayButton.addEventListener('click', (e) => {
             baseCanvasCtx.arc(centerX, baseCanvas.height / 2, baseCanvas.width / 8, 0, 2 * Math.PI);
             baseCanvasCtx.stroke();
 
-            baseCanvasCtx.font = "4rem Inter";
+            baseCanvasCtx.font = `${fontSize_main}rem Inter`;
             baseCanvasCtx.fillStyle = '#40e0d0';
             const title = titleInput.value;
             baseCanvasCtx.fillText(title, baseCanvas.width*0.01, baseCanvas.height*0.3);
@@ -313,7 +325,7 @@ audioPlayButton.addEventListener('click', (e) => {
             baseCanvasCtx.lineTo(baseCanvas.width*(0.25/2+0.75), baseCanvas.height - heightOffset - 20);
             baseCanvasCtx.stroke();
 
-            baseCanvasCtx.font = "4rem Inter";
+            baseCanvasCtx.font = `${fontSize_main}rem Inter`;
             baseCanvasCtx.fillStyle = '#40e0d0';
             const title = titleInput.value;
             baseCanvasCtx.fillText(title, baseCanvas.width*0.25/2, baseCanvas.height*0.3);   
@@ -333,10 +345,10 @@ audioPlayButton.addEventListener('click', (e) => {
         if (!isRunning) return;
 
         timerCanvasCtx.fillStyle = '#40e0d0'
-        timerCanvasCtx.font = "4rem Inter";
+        timerCanvasCtx.font = `${fontSize_main}rem Inter`;
         timerCanvasCtx.fillText(formatTime(audio.currentTime), timerCanvas.width*(0.75), baseCanvas.height*0.75);
         
-        timerCanvasCtx.font = "2rem Inter";
+        timerCanvasCtx.font = `${fontSize_secondary}rem Inter`;
         if (subtitleObjs) {
             subtitleObjs.forEach((sub) => {
                 const startInSeconds = convertTimecodeIntoSeconds(sub.startTime);
@@ -356,11 +368,11 @@ audioPlayButton.addEventListener('click', (e) => {
         if (!isRunning) return;
 
         timerCanvasCtx.fillStyle = '#40e0d0'
-        timerCanvasCtx.font = "4rem Inter";
+        timerCanvasCtx.font = `${fontSize_main}rem Inter`
         let timeLocX = (titleInput.value || subtitleObjs) ? baseCanvas.width *0.69 : baseCanvas.width * 0.44;
         timerCanvasCtx.fillText(formatTime(audio.currentTime), timeLocX, baseCanvas.height*0.53);
         
-        timerCanvasCtx.font = "1.5rem Inter";
+        timerCanvasCtx.font = `${fontSize_secondary}rem Inter`
         if (subtitleObjs) {
             subtitleObjs.forEach((sub) => {
                 const startInSeconds = convertTimecodeIntoSeconds(sub.startTime);
@@ -441,39 +453,12 @@ audioPlayButton.addEventListener('click', (e) => {
     return;
 })
 
-function record(stream, time) {
-    var recordedChunks = [];
-    return new Promise(function (res, rej) {
-        mediaRecorder = new MediaRecorder(stream, {
-            mimeType: "video/webm; codecs=vp9"
-        });
-
-        mediaRecorder.start(time || 4000);
-
-        mediaRecorder.ondataavailable = function (event) {
-            recordedChunks.push(event.data);
-
-            if (!isRunning) {
-                mediaRecorder.stop();
-            }
-        }
-
-        mediaRecorder.onstop = function (event) {
-            var blob = new Blob(recordedChunks, {type: "video/webm" });
-            var url = URL.createObjectURL(blob);
-            res(url);
-        }
-    })
-}
-
 exportButton.addEventListener('click', async (e) => {
     if (!("CropTarget" in self && "fromElement" in CropTarget)) {
         return alert("Export is not supported by current browser used. Please use chrome 104 or above.");
     }
     const cropTarget = await CropTarget.fromElement(canvasContainer);
-
-    audio.currentTime = 0;
-    
+    if(isRunning) audioPlayButton.click();
     const stream = await navigator.mediaDevices.getDisplayMedia({
         preferCurrentTab: true,
         audio: true,
@@ -483,6 +468,7 @@ exportButton.addEventListener('click', async (e) => {
 
     const [videoTrack] = stream.getVideoTracks();
     await videoTrack.cropTo(cropTarget);
+    audio.currentTime = 0;
     audioPlayButton.click();
     const mediaStreamAudioDestinationNode = new MediaStreamAudioDestinationNode(audioCtx);
     stream.addTrack(mediaStreamAudioDestinationNode.stream.getAudioTracks()[0]);
@@ -521,32 +507,6 @@ function displayFileChip(file, displayElement, fileType) {
     })
 }
 
-function removeFile(fileType) {
-    switch (fileType) {
-        case "audio":
-            if (audio.src) URL.revokeObjectURL(audio.src);
-            audio.src = '';
-            audioPlayButton.disabled = true;
-            exportButton.disabled = true;
-            resetButton.disabled = true;
-            break;
-        case "image":
-            if (image.src) URL.revokeObjectURL(image.src);
-            image.src = '';
-            break;
-        case "lyrics":
-            subtitleObjs = [];
-            break;
-        default:
-            break;
-    }
-}
-
-function truncate(str, n){
-    const strArr = str.split('.');
-    return (str.length > n) ? str.slice(0, n-1) + '&hellip;' + strArr[strArr.length - 1] : str;
-};
-
 resetButton.addEventListener('click', function(e) {
     const chipElements = document.querySelectorAll(".chip");
     const fileDropElements = document.querySelectorAll(".file-dropzone");
@@ -555,4 +515,5 @@ resetButton.addEventListener('click', function(e) {
     chipElements.forEach((item) => item.parentElement.removeChild(item));
     fileDropElements.forEach((item) => item.style.display = 'flex');
     titleInput.value = '';
+    wordLengthSpan.textContent = '0 / 50';
 })

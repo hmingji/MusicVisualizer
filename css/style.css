@@ -24,14 +24,15 @@
 
 .app-container {
     display: flex;
-    height: calc(100% - 55px);
+    /*height: calc(100% - 55px);*/
+    flex-direction: column;
 }
 
 .setting-container {
     position: relative;
     padding: 1rem;
     min-width: 300px;
-    width: 25%;
+    width: 100%;
     overflow: auto;
     background-color: var(--catskill-white-color);    
 }
@@ -69,8 +70,27 @@
 }
 
 .preview-container {
-    flex: 1;
+    margin-top: 4px;
+    height: 100vh;
     overflow: auto;
+}
+
+@media screen and (min-width: 965px) {
+    .app-container {
+        display: flex;
+        height: calc(100% - 55px);
+        flex-direction: row;
+    }
+
+    .setting-container {
+        width: 25%;
+    }
+
+    .preview-container {
+        flex: 1;
+        height: auto;
+        overflow: auto;
+    }
 }
 
 .preview-container h3 {
