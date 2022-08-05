@@ -10,6 +10,7 @@ const titleInput = document.querySelector('.title-input');
 const audioPlayButton = document.querySelector('#audioplay-button');
 const exportButton = document.querySelector('#export-button');
 const resetButton = document.querySelector('#reset-button');
+const backdrops = document.querySelectorAll('.backdrop');
 const audioCtx = new AudioContext();
 const wavePathButtons = document.querySelectorAll('input[name="wavepath"]');
 const wordLengthSpan = document.getElementById('wordlength-span');
@@ -71,7 +72,6 @@ audioFileDropzone.addEventListener('drop', function(e) {
         return alert("File type uploaded is not correct.")
     } 
 
-    //get the audio file and assign to the audio element
     audio.src = URL.createObjectURL(files[0]);
     audio.load();
     audioPlayButton.disabled = false;
@@ -178,7 +178,6 @@ audioFileInput.addEventListener('change', function(e) {
         return alert("File type uploaded is not correct.")
     } 
 
-    //get the audio file and assign to the audio element
     audio.src = URL.createObjectURL(files[0]);
     audio.load();
     audioPlayButton.disabled = false;
@@ -294,13 +293,15 @@ audioPlayButton.addEventListener('click', (e) => {
             baseCanvasCtx.beginPath();
             baseCanvasCtx.lineWidth = 20;
             baseCanvasCtx.strokeStyle = '#40e0d0';
-            baseCanvasCtx.arc(baseCanvas.width / 2, baseCanvas.height / 2, 190, 0, 2 * Math.PI);
+
+            let centerX = (titleInput.value || subtitleObjs) ? baseCanvas.width / 4 * 3 : baseCanvas.width / 2;
+            baseCanvasCtx.arc(centerX, baseCanvas.height / 2, baseCanvas.width / 8, 0, 2 * Math.PI);
             baseCanvasCtx.stroke();
 
             baseCanvasCtx.font = "4rem Inter";
             baseCanvasCtx.fillStyle = '#40e0d0';
             const title = titleInput.value;
-            baseCanvasCtx.fillText(title, baseCanvas.width*0.25/2, baseCanvas.height*0.25/2);
+            baseCanvasCtx.fillText(title, baseCanvas.width*0.01, baseCanvas.height*0.3);
             
         } else {
             baseCanvasCtx.clearRect(0, 0, baseCanvas.width, baseCanvas.height);
@@ -350,6 +351,36 @@ audioPlayButton.addEventListener('click', (e) => {
         requestAnimationFrame(horizontalAnimateTimer);
     }
 
+    function circularAnimateTimer() {
+        timerCanvasCtx.clearRect(0, 0, timerCanvas.width, timerCanvas.height);
+        if (!isRunning) return;
+
+        timerCanvasCtx.fillStyle = '#40e0d0'
+        timerCanvasCtx.font = "4rem Inter";
+        let timeLocX = (titleInput.value || subtitleObjs) ? baseCanvas.width *0.69 : baseCanvas.width * 0.44;
+        timerCanvasCtx.fillText(formatTime(audio.currentTime), timeLocX, baseCanvas.height*0.53);
+        
+        timerCanvasCtx.font = "1.5rem Inter";
+        if (subtitleObjs) {
+            subtitleObjs.forEach((sub) => {
+                const startInSeconds = convertTimecodeIntoSeconds(sub.startTime);
+                const endInSeconds = convertTimecodeIntoSeconds(sub.endTime);
+                if (audio.currentTime > startInSeconds && audio.currentTime < endInSeconds) timerCanvasCtx.fillText(sub.text, timerCanvas.width*0.01, baseCanvas.height*0.5 );
+            });
+        }
+
+        timerCanvasCtx.fillStyle = '#000000'
+        timerCanvasCtx.beginPath();
+        timerCanvasCtx.lineWidth = 10;
+        timerCanvasCtx.strokeStyle = '#000000';
+
+        let centerX = (titleInput.value || subtitleObjs) ? timerCanvas.width / 4 * 3 : timerCanvas.width / 2;
+        timerCanvasCtx.arc(centerX, timerCanvas.height / 2, timerCanvas.width / 8, 0, 2 * Math.PI * audio.currentTime/audio.duration);
+        timerCanvasCtx.stroke();
+
+        requestAnimationFrame(circularAnimateTimer);
+    }
+
     function horizontalAnimate() {
         x = 0;
         audioCanvasCtx.clearRect(0, 0, audioCanvas.width, audioCanvas.height);
@@ -376,14 +407,15 @@ audioPlayButton.addEventListener('click', (e) => {
         audioAnalyser.getByteFrequencyData(dataArray);
 
         for (let i = 0; i < bufferLength + dataArrayOffset; i++){
-            (i < dataArrayOffset) ? barHeight = 0 : barHeight = dataArray[i - dataArrayOffset];
+            (i < dataArrayOffset) ? barHeight = 0 : barHeight = dataArray[i - dataArrayOffset] * 0.75;
             
             audioCanvasCtx.save();
-            audioCanvasCtx.translate(audioCanvas.width / 2, audioCanvas.height / 2);
+            let centerX = (titleInput.value || subtitleObjs) ? baseCanvas.width / 4 * 3 : baseCanvas.width / 2;
+            audioCanvasCtx.translate(centerX, audioCanvas.height / 2);
             audioCanvasCtx.rotate(i * Math.PI * 2 / (bufferLength + dataArrayOffset));
             
             audioCanvasCtx.fillStyle = "#40e0d0";
-            audioCanvasCtx.fillRect(0, 190, barWidth, barHeight);
+            audioCanvasCtx.fillRect(0, audioCanvas.width / 8, barWidth, barHeight);
 
             x += barWidth;
             audioCanvasCtx.restore();
@@ -402,6 +434,7 @@ audioPlayButton.addEventListener('click', (e) => {
     if (wavePathOption === "circular") {
         drawBase("circular");
         circularAnimate();
+        if (timerOption === "enable") circularAnimateTimer();
         return;
     }
 
@@ -415,7 +448,6 @@ function record(stream, time) {
             mimeType: "video/webm; codecs=vp9"
         });
 
-        //ondataavailable will fire in interval of `time || 4000 ms`
         mediaRecorder.start(time || 4000);
 
         mediaRecorder.ondataavailable = function (event) {
@@ -440,13 +472,14 @@ exportButton.addEventListener('click', async (e) => {
     }
     const cropTarget = await CropTarget.fromElement(canvasContainer);
 
-    //auto rewind the audio back to starting point
-    //disable all control on the webpage
+    audio.currentTime = 0;
+    
     const stream = await navigator.mediaDevices.getDisplayMedia({
         preferCurrentTab: true,
         audio: true,
         video: true
     });
+    backdrops.forEach((backdrop) => backdrop.style.display = 'block');
 
     const [videoTrack] = stream.getVideoTracks();
     await videoTrack.cropTo(cropTarget);
@@ -461,9 +494,9 @@ exportButton.addEventListener('click', async (e) => {
     recording.then(url => {
         link$.setAttribute('href', url);
         link$.click();
+        backdrops.forEach((backdrop) => backdrop.style.display = 'none');
     })
 
-    //enable all control on the webpage
 })
 
 function displayFileChip(file, displayElement, fileType) {
@@ -521,4 +554,5 @@ resetButton.addEventListener('click', function(e) {
     ["audio", "image", "lyrics"].forEach((item) => removeFile(item));
     chipElements.forEach((item) => item.parentElement.removeChild(item));
     fileDropElements.forEach((item) => item.style.display = 'flex');
+    titleInput.value = '';
 })

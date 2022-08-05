@@ -28,11 +28,44 @@
 }
 
 .setting-container {
+    position: relative;
     padding: 1rem;
     min-width: 300px;
     width: 25%;
     overflow: auto;
     background-color: var(--catskill-white-color);    
+}
+
+.backdrop {
+    display: none;
+    position: absolute;
+    top:0;
+    left:0;
+    width: 100%;
+    height: 100%;
+    margin:auto;
+    background-color:rgba(0,0,0,0.3);
+    z-index:99999;
+
+}
+
+.pop-up {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    padding: 4px 8px;
+    border-radius: 4rem;
+    background-color: white;
+    align-self: center;
+}
+
+.backdrop p {
+    color: black;
+    font-size: 1rem;
+    text-justify: center;
+    text-align: center;
 }
 
 .preview-container {
@@ -127,6 +160,10 @@
 #audio {
     width: 100%;
     margin-top: 4px;
+}
+
+.audio-container {
+    position: relative;
 }
 
 button {

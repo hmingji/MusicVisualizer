@@ -19,6 +19,11 @@
 
         <div class="app-container">
             <div class="setting-container">
+                <div class="backdrop">
+                    <div class="pop-up">
+                        <p>Exporting... Please let the animation at preview session run till the end.</p>
+                    </div>
+                </div>
                 <p>Title</p>
                 <input class="title-input" type="text" placeholder="Optional - music title" maxlength="50">
                 <span id="wordlength-span">0 / 50</span>
@@ -76,7 +81,10 @@
                     <canvas id="timer-canvas"></canvas>
                     <canvas id="audio-visualizer-canvas"></canvas>
                 </div>
-                <audio id="audio" controls></audio>
+                <div class="audio-container">
+                    <div class="backdrop"></div>
+                    <audio id="audio" controls></audio>
+                </div>
                 <svg style="display: none;">
                     <defs>
                         <filter id="goo">
