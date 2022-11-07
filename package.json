@@ -1,0 +1,22 @@
+{
+  "name": "musicvisualizer",
+  "version": "1.0.0",
+  "description": "Using html5 canvas to visualize audio spectrum, display lyrics and play time for simple music video.  \r &nbsp;",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hmingji/MusicVisualizer.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hmingji/MusicVisualizer/issues"
+  },
+  "homepage": "https://github.com/hmingji/MusicVisualizer#readme",
+  "dependencies": {
+    "parcel": "^2.7.0"
+  }
+}
