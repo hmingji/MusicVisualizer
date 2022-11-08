@@ -1,9 +1,7 @@
-const audioFileDropzone = document.querySelector('.file-dropzone.audiofile');
+
 const lyricsFileDropzone = document.querySelector('.file-dropzone.lyricsfile');
 const imageFileDropzone = document.querySelector('.file-dropzone.imagefile');
 const canvasContainer = document.querySelector('.canvas-container');
-const audio = document.querySelector('#audio'); 
-const audioFileInput = document.querySelector('#audio-file');
 const lyricsFileInput = document.querySelector('#lyrics-file');
 const imageFileInput = document.querySelector('#image-file');
 const titleInput = document.querySelector('.title-input');
@@ -12,7 +10,6 @@ const exportButton = document.querySelector('#export-button');
 const resetButton = document.querySelector('#reset-button');
 const previewSession = document.querySelector('.preview-container');
 const backdrops = document.querySelectorAll('.backdrop');
-const audioCtx = new AudioContext();
 const wavePathButtons = document.querySelectorAll('input[name="wavepath"]');
 const wordLengthSpan = document.getElementById('wordlength-span');
 const timerButtons = document.querySelectorAll('input[name=timer]');
@@ -60,211 +57,8 @@ let audioAnalyser;
 var wavePathOption = "horizontal";
 var isRunning = false;
 
-audio.addEventListener('play', (e) => {
-    isRunning = true;
-    audioPlayButton.textContent = 'Pause';
-})
-
-audio.addEventListener('pause', (e) => {
-    isRunning = false;
-    audioPlayButton.textContent = 'Play';
-})
-
-audioFileDropzone.addEventListener('dragenter', (e) => {
-    e.preventDefault();
-    setActive(e.currentTarget);
-})
-
-audioFileDropzone.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    setActive(e.currentTarget);
-})
-
-audioFileDropzone.addEventListener('dragleave', (e) => {
-    e.preventDefault();
-    setActive(e.currentTarget, false);
-})
-
-audioFileDropzone.addEventListener('drop', function(e) {
-    e.preventDefault();
-    setActive(e.currentTarget, false);
-
-    const { files } = e.dataTransfer;
-    
-    if (isMultipleFiles(files)) {
-        return alert("Only one audio file to be uploaded.");
-    }  
-    
-    if (!isCorrectFileType(files, ["audio/mpeg", "audio/wav"])){
-        return alert("File type uploaded is not correct.")
-    } 
-
-    audio.src = URL.createObjectURL(files[0]);
-    audio.load();
-    audioPlayButton.disabled = false;
-    exportButton.disabled = false;
-    resetButton.disabled = false;
-
-    this.style.display = 'none';
-    displayFileChip(files[0], this.nextElementSibling, "audio");
-})
-
-lyricsFileDropzone.addEventListener('dragenter', (e) => {
-    e.preventDefault();
-    setActive(e.currentTarget);
-})
-
-lyricsFileDropzone.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    setActive(e.currentTarget);
-})
-
-lyricsFileDropzone.addEventListener('dragleave', (e) => {
-    e.preventDefault();
-    setActive(e.currentTarget, false);
-})
-
-lyricsFileDropzone.addEventListener('drop', function(e) {
-    e.preventDefault();
-    setActive(e.currentTarget, false);
-
-    const { files } = e.dataTransfer;
-    
-    if (isMultipleFiles(files)) {
-        return alert("Only one audio file to be uploaded.");
-    }  
-    
-    files[0].text().then((result) => {
-        subtitleObjs = PF_SRT.parse(result);
-        if (subtitleObjs.length == 0) alert("Unable to read the file.");
-    }).catch((error) => {
-        console.log(error);
-    });
-    
-    this.style.display = 'none';
-    displayFileChip(files[0], this.nextElementSibling, "lyrics");
-})
-
-imageFileDropzone.addEventListener('dragenter', (e) => {
-    e.preventDefault();
-    setActive(e.currentTarget);
-})
-
-imageFileDropzone.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    setActive(e.currentTarget);
-})
-
-imageFileDropzone.addEventListener('dragleave', (e) => {
-    e.preventDefault();
-    setActive(e.currentTarget, false);
-})
-
-imageFileDropzone.addEventListener('drop', function(e) {
-    e.preventDefault();
-    setActive(e.currentTarget, false);
-
-    const { files } = e.dataTransfer;
-    
-    if (isMultipleFiles(files)) {
-        return alert("Only one image file to be uploaded.");
-    }  
-    
-    if (!isCorrectFileType(files, ["image/jpeg", "image/png"])){
-        return alert("File type uploaded is not correct.")
-    } 
-
-    image.src = URL.createObjectURL(files[0]);
-
-    this.style.display = 'none';
-    displayFileChip(files[0], this.nextElementSibling, "image");
-})
-
-audioFileInput.addEventListener('change', function(e) {
-    const { files } = e.target;
-
-    if (isMultipleFiles(files)) {
-        return alert("Only one audio file to be uploaded.");
-    }  
-    
-    if (!isCorrectFileType(files, ["audio/mpeg", "audio/wav"])){
-        return alert("File type uploaded is not correct.")
-    } 
-
-    audio.src = URL.createObjectURL(files[0]);
-    audio.load();
-    audioPlayButton.disabled = false;
-    exportButton.disabled = false;
-    resetButton.disabled = false;
-    
-    this.parentElement.style.display = 'none';
-    displayFileChip(files[0], this.parentElement.nextElementSibling, "audio");
-    this.value = '';
-})
-
-lyricsFileInput.addEventListener('change', function(e) {
-    const { files } = e.target;
-
-    if (isMultipleFiles(files)) {
-        return alert("Only one file to be uploaded.");
-    }  
-    
-    files[0].text().then((result) => {
-        subtitleObjs = PF_SRT.parse(result);
-        if (subtitleObjs.length == 0) alert("Unable to read the file.");
-    }).catch((error) => {
-        console.log(error);
-    });
-
-    this.parentElement.style.display = 'none';
-    displayFileChip(files[0], this.parentElement.nextElementSibling, "lyrics");
-    this.value = '';
-})
-
-imageFileInput.addEventListener('change', function(e) {
-    const { files } = e.target;
-    
-    if (isMultipleFiles(files)) {
-        return alert("Only one image file to be uploaded.");
-    }  
-    
-    if (!isCorrectFileType(files, ["image/jpeg", "image/png"])){
-        return alert("File type uploaded is not correct.")
-    } 
-
-    image.src = URL.createObjectURL(files[0]);
-
-    this.parentElement.style.display = 'none';
-    displayFileChip(files[0], this.parentElement.nextElementSibling, "image");
-    this.value = '';
-})
-
 document.addEventListener('dragover', (e) => e.preventDefault());
 document.addEventListener('drop', (e) => e.preventDefault());
-
-for (const wavePathButton of wavePathButtons) {
-    wavePathButton.addEventListener('change', function(event){
-        if (this.checked) wavePathOption = this.value;
-        return;
-    })
-}
-
-for (const timerButton of timerButtons) {
-    timerButton.addEventListener('change', function(event){
-        if (this.checked) timerOption = this.value;
-        return;
-    })
-}
-
-audio.addEventListener('ended', (e) => {
-    isRunning = false;
-    return;
-})
-
-titleInput.addEventListener('input', function(event) {
-    wordLengthSpan.textContent = `${this.value.length} / 50`;
-    return; 
-})
 
 audioPlayButton.addEventListener('click', (e) => {
     if (isRunning) {
@@ -485,35 +279,4 @@ exportButton.addEventListener('click', async (e) => {
 
 })
 
-function displayFileChip(file, displayElement, fileType) {
-    const div = document.createElement('div');
-    div.classList.add('chip');
-    div.innerHTML = `
-        <div style="display: flex; align-items: center;">
-            <i class="fa-solid fa-file"></i>
-            <p style="padding-left: 4px">${truncate(file.name, 15)}</p>
-        </div>
-        <span class="closebtn ${fileType}">&times;</span>
-    `;
-    
-    displayElement.appendChild(div);
 
-    const spanElement = document.querySelector(`.closebtn.${fileType}`);
-    spanElement.addEventListener('click', function() {
-        this.parentElement.parentElement.previousElementSibling.style.display = 'flex';
-        const elementToRemove = this.parentElement;
-        elementToRemove.parentElement.removeChild(elementToRemove);
-        removeFile(fileType);
-    })
-}
-
-resetButton.addEventListener('click', function(e) {
-    const chipElements = document.querySelectorAll(".chip");
-    const fileDropElements = document.querySelectorAll(".file-dropzone");
-
-    ["audio", "image", "lyrics"].forEach((item) => removeFile(item));
-    chipElements.forEach((item) => item.parentElement.removeChild(item));
-    fileDropElements.forEach((item) => item.style.display = 'flex');
-    titleInput.value = '';
-    wordLengthSpan.textContent = '0 / 50';
-})

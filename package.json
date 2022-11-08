@@ -2,9 +2,10 @@
   "name": "musicvisualizer",
   "version": "1.0.0",
   "description": "Using html5 canvas to visualize audio spectrum, display lyrics and play time for simple music video.  \r &nbsp;",
-  "main": "app.js",
+  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "parcel index.html",
+    "build": "NODE_ENV=production parvel build index.html"
   },
   "repository": {
     "type": "git",
@@ -16,7 +17,7 @@
     "url": "https://github.com/hmingji/MusicVisualizer/issues"
   },
   "homepage": "https://github.com/hmingji/MusicVisualizer#readme",
-  "dependencies": {
+  "devDependencies": {
     "parcel": "^2.7.0"
   }
 }
