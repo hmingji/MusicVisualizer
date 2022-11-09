@@ -6,14 +6,34 @@ import { setElementActiveState } from "./util/setElementActiveState";
 
 const audioCtx = new AudioContext();
 let isRunning = false;
+let audioSource;
+let audioAnalyser;
 
 export function initAudio() {
     setFileDropEventHandler(audioFileDropzone, handleFileDrop);
     setFileInputHandler(audioFileInput, handleFileInput);
+    setAudioHandler();
 }
 
 export function getAudioPlayState() {
     return isRunning;
+}
+
+export function getAudioCtx() {
+    return audioCtx;
+}
+
+export function initAudioAnalyser() {
+    if (!audioSource) audioSource = audioCtx.createMediaElementSource(audio);
+    audioAnalyser = audioCtx.createAnalyser();
+    audioSource.connect(audioAnalyser);
+    audioAnalyser.connect(audioCtx.destination);
+    audioAnalyser.fftSize = 256;
+    audioAnalyser.smoothingTimeConstant = 0.8;
+    audioAnalyser.minDecibels = -80;
+    audioAnalyser.maxDecibels = -10;
+
+    return audioAnalyser;
 }
 
 function handleFileDrop(e) {
