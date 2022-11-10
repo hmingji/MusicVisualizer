@@ -1,6 +1,6 @@
 let fontSize = {
-    primary: Number,
-    secondary: Number,
+    primary: 1,
+    secondary: 2,
 };
 
 function assignFontSize(mediaQuery) {
@@ -16,9 +16,11 @@ function assignFontSize(mediaQuery) {
 const mediaQuery = window.matchMedia("(min-width: 965px)");
 
 export function initResponsiveFont() {
+    assignFontSize(mediaQuery);
     mediaQuery.addEventListener('change', assignFontSize);
 } 
 
 export function getFontSize() {
+    
     return fontSize;
 }

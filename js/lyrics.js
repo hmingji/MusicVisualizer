@@ -15,42 +15,46 @@ export function getLyricsObjs() {
     return lyricsObjs;
 }
 
-function handleFileDrop(e) {
+export function resetLyrics() {
+    lyricsObjs = [];
+}
+
+async function handleFileDrop(e) {
     e.preventDefault();
     setElementActiveState(e.currentTarget, false);
-
+    console.log(e.currentTarget);
     const { files } = e.dataTransfer;
     
     if (isMultipleFiles(files)) {
         return alert("Only one audio file to be uploaded.");
     }  
     
-    files[0].text().then((result) => {
-        lyricsObjs = srtParser(result);
-        if (lyricsObjs.length == 0) alert("Unable to read the file.");
+    await files[0].text().then((result) => {
+        lyricsObjs = srtParser(result);  
     }).catch((error) => {
         console.log(error);
     });
-    
+    if (lyricsObjs.length == 0) return alert("Unable to read the file.");
+    //need to refer to the dom directly.
     e.currentTarget.style.display = 'none';
     displayFileChip(files[0], e.currentTarget.nextElementSibling, "lyrics");
 };
 
-function handleFileInput(e) {
+async function handleFileInput(e) {
     const { files } = e.target;
 
     if (isMultipleFiles(files)) {
         return alert("Only one file to be uploaded.");
     }  
     
-    files[0].text().then((result) => {
-        lyricsObjs = srtParser(result);
-        if (lyricsObjs.length == 0) alert("Unable to read the file.");
+    await files[0].text().then((result) => {
+        lyricsObjs = srtParser(result);     
     }).catch((error) => {
         console.log(error);
     });
 
-    e.currentTarget.parentElement.style.display = 'none';
-    displayFileChip(files[0], e.currentTarget.parentElement.nextElementSibling, "lyrics");
-    e.currentTarget.value = '';
+    if (lyricsObjs.length == 0) return alert("Unable to read the file.");
+    e.target.parentElement.style.display = 'none';
+    displayFileChip(files[0], e.target.parentElement.nextElementSibling, "lyrics");
+    e.target.value = '';
 }

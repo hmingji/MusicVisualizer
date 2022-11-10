@@ -1,4 +1,6 @@
 import { setElementActiveState } from "./util/setElementActiveState";
+import { removeFile } from "./util/removeFile";
+import { truncate } from "./util/truncate"
 
 export function setFileDropEventHandler(element, fileDropHandler) {
     element.addEventListener('dragenter', (e) => {

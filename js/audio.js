@@ -19,6 +19,15 @@ export function getAudioPlayState() {
     return isRunning;
 }
 
+export function setAudioPlayState(state) {
+    isRunning = state;
+}
+
+export function resetAudio() {
+    if (audio.src) URL.revokeObjectURL(audio.src);
+    audio.src = ''
+}
+
 export function getAudioCtx() {
     return audioCtx;
 }
@@ -85,6 +94,7 @@ function handleFileInput(e) {
 function setAudioHandler() {
     audio.addEventListener('play', (e) => {
         isRunning = true;
+        console.log(getAudioPlayState());
         audioPlayButton.textContent = 'Pause';
     })
     

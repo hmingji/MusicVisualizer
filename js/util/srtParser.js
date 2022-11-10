@@ -19,7 +19,7 @@ export function srtParser(strContent) {
     strContent = strContent.replace(/\r\n|\r|\n/g, "\n");
     strContent = strContent.concat("EndOfString");
 
-    while ((matches = pattern.exec(f)) != null) {
+    while ((matches = pattern.exec(strContent)) != null) {
         result.push(convertIntoLineObj(matches));
     }
 

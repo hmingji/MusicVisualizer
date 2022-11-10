@@ -1,6 +1,6 @@
-import { getAudioCtx, getAudioPlayState, initAudioAnalyser } from "./audio";
+import { getAudioCtx, getAudioPlayState, initAudioAnalyser, setAudioPlayState } from "./audio";
 import { getBackgroundImage } from "./backgroundImage";
-import { audioCanvas, baseCanvas, timerCanvas, audio, audioPlayButton } from "./domLoader";
+import { audioCanvas, baseCanvas, timerCanvas, audio, audioPlayButton, previewSession } from "./domLoader";
 import { drawText, drawLyricsLine, drawHorizontalWaveBase, drawCircularWaveBase, drawBackground } from "./draw";
 import { getFontSize } from "./font";
 import { getLyricsObjs } from "./lyrics";
@@ -19,32 +19,36 @@ timerCanvas.height = window.innerHeight;
 timerCanvas.width = window.innerWidth;
 const timerCanvasCtx = timerCanvas.getContext('2d');
 
-const { title } = getSetting();
-const { primary } = getFontSize(); 
-
 const drawTimerArgs = (mode) => { 
-    posXForCircularMode = (getSetting().title || getLyricsObjs()) ? timerCanvas.width * 0.69 : timerCanvas.width * 0.44;
+    const { primary } = getFontSize();
+    const lyrics = getLyricsObjs();
+    const { title } = getSetting();
+    posXForCircularMode = (title || lyrics) ? timerCanvas.width * 0.69 : timerCanvas.width * 0.44;
+    
     return {
         canvasCtx: timerCanvasCtx,
         text: formatTime(audio.currentTime),
-        fontSize: getFontSize().primary,
+        fontSize: primary,
         pos: {
             x: (mode === 'horizontal') ? timerCanvas.width * 0.75 : posXForCircularMode,
-            y: (mode === 'horizontal') ? timerCanvas.width * 0.75 : timerCanvas.height * 0.53,
+            y: (mode === 'horizontal') ? timerCanvas.height * 0.75 : timerCanvas.height * 0.53,
         }
     }
 }
 
-const drawLyricsArgs = (mode) => ({
-    canvasCtx: timerCanvasCtx,
-    lyrics: getLyricsObjs(),
-    fontSize: getFontSize().secondary,
-    pos: {
-        x: (mode === 'horizontal') ? timerCanvas.width * 0.25/2 : timerCanvas.width * 0.01,
-        y: (mode === 'horizontal') ? timerCanvas.height * 0.5 : timerCanvas.height * 0.5,
-    },
-    audio: audio,
-})
+const drawLyricsArgs = (mode) => {
+    const { secondary } = getFontSize();
+    return {
+        canvasCtx: timerCanvasCtx,
+        lyrics: getLyricsObjs(),
+        fontSize: secondary,
+        pos: {
+            x: (mode === 'horizontal') ? timerCanvas.width * 0.25/2 : timerCanvas.width * 0.01,
+            y: (mode === 'horizontal') ? timerCanvas.height * 0.5 : timerCanvas.height * 0.5,
+        },
+        audio: audio,
+    }
+}
 
 const heightOffset = 50;
 
@@ -52,27 +56,28 @@ export function animateTimerForHorizontalWave() {
     timerCanvasCtx.clearRect(0, 0, timerCanvas.width, timerCanvas.height);
     if (!getAudioPlayState()) return;
 
-    drawText([...drawTimerArgs('horizontal')]);
-    drawLyricsLine([...drawLyricsArgs('horizontal')]);
-    
-    const drawWaveBaseArgs = {
-        canvasCtx: timerCanvasCtx,
-        style: {
-            lineWidth: 10,
-            strokeStyle: '#000000',
-        },
-        startPos: {
-            x: timerCanvas.width * 0.25/2,
-            y: timerCanvas.height - heightOffset - 20,
-        },
-        endPos: {
-            x: timerCanvas.width * (0.75+0.25/2) * audio.currentTime/audio.duration,
-            y: timerCanvas.height - heightOffset - 20,
+    const { timer } = getSetting();
+    if (timer === 'enable') {
+        const drawWaveBaseArgs = {
+            canvasCtx: timerCanvasCtx,
+            style: {
+                lineWidth: 10,
+                strokeStyle: '#000000',
+            },
+            startPos: {
+                x: timerCanvas.width * 0.25/2,
+                y: timerCanvas.height - heightOffset - 15,
+            },
+            endPos: {
+                x: timerCanvas.width * (0.25/2 + 0.75 * audio.currentTime/audio.duration),
+                y: timerCanvas.height - heightOffset - 15,
+            }
         }
+        drawHorizontalWaveBase(...Object.values(drawWaveBaseArgs));
+        drawText(...Object.values(drawTimerArgs('horizontal')));
     }
-    
-    drawHorizontalWaveBase([...drawWaveBaseArgs]);
-    
+
+    drawLyricsLine(...Object.values(drawLyricsArgs('horizontal')));
     requestAnimationFrame(animateTimerForHorizontalWave);
 }
 
@@ -80,32 +85,35 @@ export function animateTimerForCircularWave() {
     timerCanvasCtx.clearRect(0, 0, timerCanvas.width, timerCanvas.height);
     if (!getAudioPlayState()) return;
 
-    drawText([...drawTimerArgs('circular')]);
-    drawLyricsLine([...drawLyricsArgs('circular')]);
-    
-    const drawWaveBaseArgs = {
-        canvasCtx: timerCanvasCtx,
-        style: {
-            lineWidth: 10,
-            strokeStyle: '#000000',
-        },
-        centrePos: {
-            x: (getSetting().title || getLyricsObjs()) ? timerCanvas.width / 4*3 : timerCanvas.width / 2,
-            y: timerCanvas.height / 2,
-        },
-        radius: timerCanvas.width / 8,
-        endAngle: 2 * Math.PI * audio.currentTime/audio.duration, //dynamics angle to change playback time
+    const lyrics = getLyricsObjs();
+    const { title, timer } = getSetting();
+    if (timer === 'enable') {
+        const drawWaveBaseArgs = {
+            canvasCtx: timerCanvasCtx,
+            style: {
+                lineWidth: 10,
+                strokeStyle: '#000000',
+            },
+            centrePos: {
+                x: (title || lyrics) ? timerCanvas.width / 4*3 : timerCanvas.width / 2,
+                y: timerCanvas.height / 2,
+            },
+            radius: timerCanvas.width / 8,
+            endAngle: 2 * Math.PI * audio.currentTime/audio.duration, //dynamics angle to change playback time
+        }
+        drawCircularWaveBase(...Object.values(drawWaveBaseArgs));
+        drawText(...Object.values(drawTimerArgs('circular')));
     }
     
-    drawCircularWaveBase([...drawWaveBaseArgs]);
-    
+    drawLyricsLine(...Object.values(drawLyricsArgs('circular')));
     requestAnimationFrame(animateTimerForCircularWave);
 }
 
 function drawBaseForHorizontalWave() {
     baseCanvasCtx.clearRect(0, 0, baseCanvas.width, baseCanvas.height);
     drawBackground(baseCanvasCtx, getBackgroundImage(), baseCanvas);
-    
+    const { primary } = getFontSize();
+    const { title } = getSetting();
     const drawWaveBaseArgs = {
         canvasCtx: baseCanvasCtx,
         style: {
@@ -121,13 +129,17 @@ function drawBaseForHorizontalWave() {
             y: baseCanvas.height - heightOffset - 20,
         }
     }
-    drawHorizontalWaveBase([...drawWaveBaseArgs]);
+    drawHorizontalWaveBase(...Object.values(drawWaveBaseArgs));
     drawText(baseCanvasCtx, title, primary, { x: baseCanvas.width * 0.25/2, y: baseCanvas.height * 0.3 });
 }
 
 function drawBaseForCircularWave() {
     baseCanvasCtx.clearRect(0, 0, baseCanvas.width, baseCanvas.height);
     drawBackground(baseCanvasCtx, getBackgroundImage(), baseCanvas);
+
+    const { primary } = getFontSize();
+    const lyrics = getLyricsObjs();
+    const { title } = getSetting();
 
     const drawWaveBaseArgs = {
         canvasCtx: baseCanvasCtx,
@@ -136,13 +148,13 @@ function drawBaseForCircularWave() {
             strokeStyle: '#40e0d0',
         },
         centrePos: {
-            x: (getSetting().title || getLyricsObjs()) ? timerCanvas.width / 4*3 : timerCanvas.width / 2,
+            x: (title || lyrics) ? timerCanvas.width / 4*3 : timerCanvas.width / 2,
             y: baseCanvas.height / 2,
         },
         radius: baseCanvas.width / 8,
         endAngle: 2 * Math.PI,
     }
-    drawBaseForCircularWave([...drawWaveBaseArgs]);
+    drawCircularWaveBase(...Object.values(drawWaveBaseArgs));
     drawText(baseCanvasCtx, title, primary, { x: baseCanvas.width * 0.01, y: baseCanvas.height * 0.3 });
 }
 
@@ -156,6 +168,7 @@ export function initCanvas() {
         }
         if (audioCtx) audioCtx.resume();
         audio.play();
+        setAudioPlayState(true);
         previewSession.scrollIntoView({ behavior: "smooth", block: "end" });
         const audioAnalyser = initAudioAnalyser();
         const bufferLength = audioAnalyser.frequencyBinCount;
@@ -183,7 +196,7 @@ export function initCanvas() {
                 
                 x += barWidth;
             }
-            requestAnimationFrame(horizontalWavenimate);
+            requestAnimationFrame(horizontalWaveAnimate);
         }
     
         function circularWaveAnimate() {
@@ -212,13 +225,13 @@ export function initCanvas() {
         if (wavePath === "horizontal") {
             drawBaseForHorizontalWave();
             horizontalWaveAnimate();
-            if (timer === "enable") animateTimerForHorizontalWave();
+            animateTimerForHorizontalWave();
         }
     
         if (wavePath === "circular") {
             drawBaseForCircularWave();
             circularWaveAnimate();
-            if (timer === "enable") animateTimerForCircularWave();
+            animateTimerForCircularWave();
         }
     })
 }

@@ -19,7 +19,7 @@ export function initSetting() {
     }
     
     titleInput.addEventListener('input', function(event) {
-        wordLengthSpan.textContent = `${this.value.length} / 50`;
+        wordLengthSpan.textContent = `${event.currentTarget.value.length} / 50`;
         return; 
     })
 }

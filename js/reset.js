@@ -1,4 +1,4 @@
-import { titleInput, wordLengthSpan } from "./domLoader";
+import { titleInput, wordLengthSpan, resetButton } from "./domLoader";
 import { removeFile } from "./util/removeFile"
 
 export function initReset() {

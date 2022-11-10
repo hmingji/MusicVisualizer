@@ -1,18 +1,21 @@
+import { resetAudio } from "../audio";
+import { getBackgroundImage, resetBackgroundImage } from "../backgroundImage";
+import { audio, audioPlayButton, exportButton, resetButton } from "../domLoader";
+import { resetLyrics } from "../lyrics";
+
 export function removeFile(fileType) {
     switch (fileType) {
         case "audio":
-            if (audio.src) URL.revokeObjectURL(audio.src);
-            audio.src = '';
+            resetAudio();
             audioPlayButton.disabled = true;
             exportButton.disabled = true;
             resetButton.disabled = true;
             break;
         case "image":
-            if (image.src) URL.revokeObjectURL(image.src);
-            image.src = '';
+            resetBackgroundImage();
             break;
         case "lyrics":
-            subtitleObjs = [];
+            resetLyrics();
             break;
         default:
             break;

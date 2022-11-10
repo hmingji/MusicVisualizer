@@ -15,6 +15,11 @@ export function getBackgroundImage() {
     return image;
 }
 
+export function resetBackgroundImage() {
+    if (image.src) URL.revokeObjectURL(image.src);
+    image.src = '';
+}
+
 function handleFileDrop(e) {
     e.preventDefault();
     setElementActiveState(e.currentTarget, false);
