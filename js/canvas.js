@@ -158,6 +158,72 @@ function drawBaseForCircularWave() {
     drawText(baseCanvasCtx, title, primary, { x: baseCanvas.width * 0.01, y: baseCanvas.height * 0.3 });
 }
 
+export function animateCanvas() {
+    const audioAnalyser = initAudioAnalyser();
+    const bufferLength = audioAnalyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+    const widthOffset = audioCanvas.width * 0.25 / 2;
+    const heightOffset = 50;
+    const baseHeight = 12;
+    const dataArrayOffset = 10;
+    const barWidth = audioCanvas.width / (bufferLength + 10) * 0.75;
+    let barHeight;
+    let x;
+    const { wavePath } = getSetting();
+    
+    function horizontalWaveAnimate() {
+        x = 0;
+        audioCanvasCtx.clearRect(0, 0, audioCanvas.width, audioCanvas.height);
+        if (!getAudioPlayState()) return;
+        audioAnalyser.getByteFrequencyData(dataArray);
+
+        for (let i = 0; i < bufferLength + dataArrayOffset; i++){
+            (i < dataArrayOffset) ? barHeight = 0 : barHeight = dataArray[i - dataArrayOffset];
+
+            audioCanvasCtx.fillStyle = "#40e0d0";
+            audioCanvasCtx.fillRect(x + widthOffset, audioCanvas.height - barHeight - baseHeight - heightOffset, barWidth, barHeight);
+            
+            x += barWidth;
+        }
+        requestAnimationFrame(horizontalWaveAnimate);
+    }
+
+    function circularWaveAnimate() {
+        x = 0;        
+        audioCanvasCtx.clearRect(0, 0, audioCanvas.width, audioCanvas.height);
+        if (!getAudioPlayState()) return;
+        audioAnalyser.getByteFrequencyData(dataArray);
+
+        for (let i = 0; i < bufferLength + dataArrayOffset; i++){
+            (i < dataArrayOffset) ? barHeight = 0 : barHeight = dataArray[i - dataArrayOffset] * 0.75;
+            
+            audioCanvasCtx.save();
+            let centerX = (getSetting().title || getLyricsObjs()) ? baseCanvas.width / 4 * 3 : baseCanvas.width / 2;
+            audioCanvasCtx.translate(centerX, audioCanvas.height / 2);
+            audioCanvasCtx.rotate(i * Math.PI * 2 / (bufferLength + dataArrayOffset));
+            
+            audioCanvasCtx.fillStyle = "#40e0d0";
+            audioCanvasCtx.fillRect(0, audioCanvas.width / 8, barWidth, barHeight);
+
+            x += barWidth;
+            audioCanvasCtx.restore();
+        }
+        requestAnimationFrame(circularWaveAnimate);
+    }
+
+    if (wavePath === "horizontal") {
+        drawBaseForHorizontalWave();
+        horizontalWaveAnimate();
+        animateTimerForHorizontalWave();
+    }
+
+    if (wavePath === "circular") {
+        drawBaseForCircularWave();
+        circularWaveAnimate();
+        animateTimerForCircularWave();
+    }
+}
+
 export function initCanvas() {
     audioPlayButton.addEventListener('click', (e) => {
         const audioCtx = getAudioCtx();
@@ -170,68 +236,5 @@ export function initCanvas() {
         audio.play();
         setAudioPlayState(true);
         previewSession.scrollIntoView({ behavior: "smooth", block: "end" });
-        const audioAnalyser = initAudioAnalyser();
-        const bufferLength = audioAnalyser.frequencyBinCount;
-        const dataArray = new Uint8Array(bufferLength);
-        const widthOffset = audioCanvas.width * 0.25 / 2;
-        const heightOffset = 50;
-        const baseHeight = 12;
-        const dataArrayOffset = 10;
-        const barWidth = audioCanvas.width / (bufferLength + 10) * 0.75;
-        let barHeight;
-        let x;
-        const { wavePath, timer } = getSetting();
-        
-        function horizontalWaveAnimate() {
-            x = 0;
-            audioCanvasCtx.clearRect(0, 0, audioCanvas.width, audioCanvas.height);
-            if (!getAudioPlayState()) return;
-            audioAnalyser.getByteFrequencyData(dataArray);
-
-            for (let i = 0; i < bufferLength + dataArrayOffset; i++){
-                (i < dataArrayOffset) ? barHeight = 0 : barHeight = dataArray[i - dataArrayOffset];
-    
-                audioCanvasCtx.fillStyle = "#40e0d0";
-                audioCanvasCtx.fillRect(x + widthOffset, audioCanvas.height - barHeight - baseHeight - heightOffset, barWidth, barHeight);
-                
-                x += barWidth;
-            }
-            requestAnimationFrame(horizontalWaveAnimate);
-        }
-    
-        function circularWaveAnimate() {
-            x = 0;        
-            audioCanvasCtx.clearRect(0, 0, audioCanvas.width, audioCanvas.height);
-            if (!getAudioPlayState()) return;
-            audioAnalyser.getByteFrequencyData(dataArray);
-    
-            for (let i = 0; i < bufferLength + dataArrayOffset; i++){
-                (i < dataArrayOffset) ? barHeight = 0 : barHeight = dataArray[i - dataArrayOffset] * 0.75;
-                
-                audioCanvasCtx.save();
-                let centerX = (getSetting().title || getLyricsObjs()) ? baseCanvas.width / 4 * 3 : baseCanvas.width / 2;
-                audioCanvasCtx.translate(centerX, audioCanvas.height / 2);
-                audioCanvasCtx.rotate(i * Math.PI * 2 / (bufferLength + dataArrayOffset));
-                
-                audioCanvasCtx.fillStyle = "#40e0d0";
-                audioCanvasCtx.fillRect(0, audioCanvas.width / 8, barWidth, barHeight);
-    
-                x += barWidth;
-                audioCanvasCtx.restore();
-            }
-            requestAnimationFrame(circularWaveAnimate);
-        }
-
-        if (wavePath === "horizontal") {
-            drawBaseForHorizontalWave();
-            horizontalWaveAnimate();
-            animateTimerForHorizontalWave();
-        }
-    
-        if (wavePath === "circular") {
-            drawBaseForCircularWave();
-            circularWaveAnimate();
-            animateTimerForCircularWave();
-        }
     })
 }

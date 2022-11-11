@@ -3,8 +3,9 @@ import { audioFileDropzone, audioFileInput, audioPlayButton, resetButton, export
 import { isMultipleFiles } from "./util/isMultipleFiles";
 import { isCorrectFileType } from "./util/isCorrectFileType";
 import { setElementActiveState } from "./util/setElementActiveState";
+import { animateCanvas } from "./canvas";
 
-const audioCtx = new AudioContext();
+let audioCtx;
 let isRunning = false;
 let audioSource;
 let audioAnalyser;
@@ -61,6 +62,7 @@ function handleFileDrop(e) {
 
     audio.src = URL.createObjectURL(files[0]);
     audio.load();
+    audioCtx = new AudioContext();
     audioPlayButton.disabled = false;
     exportButton.disabled = false;
     resetButton.disabled = false;
@@ -82,6 +84,7 @@ function handleFileInput(e) {
 
     audio.src = URL.createObjectURL(files[0]);
     audio.load();
+    audioCtx = new AudioContext();
     audioPlayButton.disabled = false;
     exportButton.disabled = false;
     resetButton.disabled = false;
@@ -98,6 +101,7 @@ function setAudioHandler() {
         settingPanelBackdrop.style.display = 'block';
         resetButton.disabled = true;
         exportButton.disabled = true;
+        animateCanvas();
     })
     
     audio.addEventListener('pause', (e) => {
