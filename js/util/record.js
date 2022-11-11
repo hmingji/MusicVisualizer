@@ -1,7 +1,7 @@
 export function record(stream, time) {
     let recordedChunks = [];
     return new Promise(function (res, rej) {
-        mediaRecorder = new MediaRecorder(stream, {
+        const mediaRecorder = new MediaRecorder(stream, {
             mimeType: "video/webm; codecs=vp9"
         });
 
