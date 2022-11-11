@@ -1,5 +1,5 @@
 import { canvasContainer, audioPlayButton, backdrops, audio, exportButton } from "./domLoader";
-import { getAudioPlayState } from "./audio";
+import { getAudioCtx, getAudioPlayState } from "./audio";
 import { record } from "./util/record";
 
 export function initExport() {
@@ -20,6 +20,7 @@ export function initExport() {
         await videoTrack.cropTo(cropTarget);
         audio.currentTime = 0;
         audioPlayButton.click();
+        const audioCtx = getAudioCtx();
         const mediaStreamAudioDestinationNode = new MediaStreamAudioDestinationNode(audioCtx);
         stream.addTrack(mediaStreamAudioDestinationNode.stream.getAudioTracks()[0]);
     
