@@ -98,7 +98,7 @@ function setAudioHandler() {
     audio.addEventListener('play', (e) => {
         isRunning = true;
         audioPlayButton.textContent = 'Pause';
-        if (backdrops.style.display !== 'block') settingPanelBackdrop.style.display = 'block';
+        if (backdrops[0].style.display !== 'block') settingPanelBackdrop.style.display = 'block';
         resetButton.disabled = true;
         exportButton.disabled = true;
         animateCanvas();
