@@ -314,4 +314,6 @@ h6 {
     margin-top: 10px;
 }
 
-/* add dynamic display based on media device */
+svg {
+    display: none;
+}
