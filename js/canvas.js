@@ -23,7 +23,7 @@ const drawTimerArgs = (mode) => {
     const { primary } = getFontSize();
     const lyrics = getLyricsObjs();
     const { title } = getSetting();
-    posXForCircularMode = (title || lyrics) ? timerCanvas.width * 0.69 : timerCanvas.width * 0.44;
+    let posXForCircularMode = (title || lyrics) ? timerCanvas.width * 0.69 : timerCanvas.width * 0.44;
     
     return {
         canvasCtx: timerCanvasCtx,
