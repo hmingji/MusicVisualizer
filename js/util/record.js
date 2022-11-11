@@ -12,7 +12,7 @@ export function record(stream, time) {
         mediaRecorder.ondataavailable = function (event) {
             recordedChunks.push(event.data);
 
-            if (!getAudioPlayState()) {
+            if (!getAudioPlayState() && mediaRecorder.state === 'recording') {
                 mediaRecorder.stop();
             }
         }

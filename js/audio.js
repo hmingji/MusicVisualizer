@@ -62,7 +62,7 @@ function handleFileDrop(e) {
 
     audio.src = URL.createObjectURL(files[0]);
     audio.load();
-    audioCtx = new AudioContext();
+    if (!audioCtx) audioCtx = new AudioContext();
     audioPlayButton.disabled = false;
     exportButton.disabled = false;
     resetButton.disabled = false;
@@ -84,7 +84,7 @@ function handleFileInput(e) {
 
     audio.src = URL.createObjectURL(files[0]);
     audio.load();
-    audioCtx = new AudioContext();
+    if (!audioCtx) audioCtx = new AudioContext();
     audioPlayButton.disabled = false;
     exportButton.disabled = false;
     resetButton.disabled = false;
