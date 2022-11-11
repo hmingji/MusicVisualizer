@@ -36,8 +36,8 @@ function handleFileDrop(e) {
 
     image.src = URL.createObjectURL(files[0]);
 
-    e.currentTarget.style.display = 'none';
-    displayFileChip(files[0], e.currentTarget.nextElementSibling, "image");
+    imageFileDropzone.style.display = 'none';
+    displayFileChip(files[0], imageFileDropzone.nextElementSibling, "image");
 };
 
 function handleFileInput(e) {
@@ -53,7 +53,7 @@ function handleFileInput(e) {
 
     image.src = URL.createObjectURL(files[0]);
 
-    e.currentTarget.parentElement.style.display = 'none';
-    displayFileChip(files[0], e.currentTarget.parentElement.nextElementSibling, "image");
-    e.currentTarget.value = '';
+    imageFileInput.parentElement.style.display = 'none';
+    displayFileChip(files[0], imageFileInput.parentElement.nextElementSibling, "image");
+    imageFileInput.value = '';
 }; 

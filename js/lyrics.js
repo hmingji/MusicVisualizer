@@ -22,7 +22,7 @@ export function resetLyrics() {
 async function handleFileDrop(e) {
     e.preventDefault();
     setElementActiveState(e.currentTarget, false);
-    console.log(e.currentTarget);
+
     const { files } = e.dataTransfer;
     
     if (isMultipleFiles(files)) {
@@ -35,9 +35,9 @@ async function handleFileDrop(e) {
         console.log(error);
     });
     if (lyricsObjs.length == 0) return alert("Unable to read the file.");
-    //need to refer to the dom directly.
-    e.currentTarget.style.display = 'none';
-    displayFileChip(files[0], e.currentTarget.nextElementSibling, "lyrics");
+    
+    lyricsFileDropzone.style.display = 'none';
+    displayFileChip(files[0], lyricsFileDropzone.nextElementSibling, "lyrics");
 };
 
 async function handleFileInput(e) {
@@ -54,7 +54,7 @@ async function handleFileInput(e) {
     });
 
     if (lyricsObjs.length == 0) return alert("Unable to read the file.");
-    e.target.parentElement.style.display = 'none';
-    displayFileChip(files[0], e.target.parentElement.nextElementSibling, "lyrics");
-    e.target.value = '';
+    lyricsFileInput.parentElement.style.display = 'none';
+    displayFileChip(files[0], lyricsFileInput.parentElement.nextElementSibling, "lyrics");
+    lyricsFileInput.value = '';
 }

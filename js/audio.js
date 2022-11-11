@@ -1,5 +1,5 @@
 import { setFileDropEventHandler, setFileInputHandler, displayFileChip } from "./fileUpload";
-import { audioFileDropzone, audioFileInput, audioPlayButton, resetButton, exportButton, audio } from "./domLoader";
+import { audioFileDropzone, audioFileInput, audioPlayButton, resetButton, exportButton, audio, settingPanelBackdrop } from "./domLoader";
 import { isMultipleFiles } from "./util/isMultipleFiles";
 import { isCorrectFileType } from "./util/isCorrectFileType";
 import { setElementActiveState } from "./util/setElementActiveState";
@@ -65,8 +65,8 @@ function handleFileDrop(e) {
     exportButton.disabled = false;
     resetButton.disabled = false;
 
-    e.currentTarget.style.display = 'none';
-    displayFileChip(files[0], e.currentTarget.nextElementSibling, "audio"); 
+    audioFileDropzone.style.display = 'none';
+    displayFileChip(files[0], audioFileDropzone.nextElementSibling, "audio"); 
 };
 
 function handleFileInput(e) {
@@ -86,25 +86,33 @@ function handleFileInput(e) {
     exportButton.disabled = false;
     resetButton.disabled = false;
     
-    e.currentTarget.parentElement.style.display = 'none';
-    displayFileChip(files[0], e.currentTarget.parentElement.nextElementSibling, "audio");
-    e.currentTarget.value = '';
+    audioFileInput.parentElement.style.display = 'none';
+    displayFileChip(files[0], audioFileInput.parentElement.nextElementSibling, "audio");
+    audioFileInput.value = '';
 };
 
 function setAudioHandler() {
     audio.addEventListener('play', (e) => {
         isRunning = true;
-        console.log(getAudioPlayState());
         audioPlayButton.textContent = 'Pause';
+        settingPanelBackdrop.style.display = 'block';
+        resetButton.disabled = true;
+        exportButton.disabled = true;
     })
     
     audio.addEventListener('pause', (e) => {
         isRunning = false;
         audioPlayButton.textContent = 'Play';
+        settingPanelBackdrop.style.display = 'none';
+        resetButton.disabled = false;
+        exportButton.disabled = false;
     })
 
     audio.addEventListener('ended', (e) => {
         isRunning = false;
-        return;
+        audioPlayButton.textContent = 'Play';
+        settingPanelBackdrop.style.display = 'none';
+        resetButton.disabled = false;
+        exportButton.disabled = false;
     })
 }

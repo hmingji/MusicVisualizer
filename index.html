@@ -24,48 +24,55 @@
                         <p>Exporting... Please let the animation at preview session run till the end.</p>
                     </div>
                 </div>
-                <p>Title</p>
-                <input class="title-input" type="text" placeholder="Optional - music title" maxlength="50">
-                <span id="wordlength-span">0 / 50</span>
+                <div class="setting-panel">
+                    <div class="backdrop" id="settingPanelBackdrop">
+                        <div class="pop-up">
+                            <p>Setting panel disabled while playing :D</p>
+                        </div>
+                    </div>
+                    <p>Title</p>
+                    <input class="title-input" type="text" placeholder="Optional - music title" maxlength="50">
+                    <span id="wordlength-span">0 / 50</span>
 
-                <p>Wave Path</p>
-                <div class="radiobutton-container">
-                    <input label="Horizontal" type="radio" name="wavepath" value="horizontal" checked>
-                    <input label="Circular" type="radio" name="wavepath" value="circular">
-                </div>       
+                    <p>Wave Path</p>
+                    <div class="radiobutton-container">
+                        <input label="Horizontal" type="radio" name="wavepath" value="horizontal" checked>
+                        <input label="Circular" type="radio" name="wavepath" value="circular">
+                    </div>       
 
-                <p>Timer Display</p>
-                <div class="radiobutton-container">
-                    <input label="Enable" type="radio" name="timer" value="enable" checked>
-                    <input label="Disabled" type="radio" name="timer" value="disable">
-                </div>
-                
-                <p>Audio File*</p>
-                <div class="file-dropzone audiofile">
-                    <i class="fa-solid fa-upload fa-2x"></i>
-                    <input type="file" class="file" id="audio-file" accept="audio/mp3, audio/wav" />
-                    <label for="audio-file">Choose only one audio file</label>
-                    <h3>or drag & drop your mp3 or wav file here</h3>
-                </div>
-                <div class="chip-container"></div>
+                    <p>Timer Display</p>
+                    <div class="radiobutton-container">
+                        <input label="Enable" type="radio" name="timer" value="enable" checked>
+                        <input label="Disabled" type="radio" name="timer" value="disable">
+                    </div>
+                    
+                    <p>Audio File*</p>
+                    <div class="file-dropzone audiofile">
+                        <i class="fa-solid fa-upload fa-2x"></i>
+                        <input type="file" class="file" id="audio-file" accept="audio/mp3, audio/wav" />
+                        <label for="audio-file">Choose only one audio file</label>
+                        <h3>or drag & drop your mp3 or wav file here</h3>
+                    </div>
+                    <div class="chip-container"></div>
 
-                <p>Lyrics (Optional)</p>
-                <div class="file-dropzone lyricsfile">
-                    <i class="fa-solid fa-upload fa-2x"></i>
-                    <input type="file" class="file" id="lyrics-file" />
-                    <label for="lyrics-file">Choose only one text file to upload</label>
-                    <h3>or drag & drop your srt file here</h3>
+                    <p>Lyrics (Optional)</p>
+                    <div class="file-dropzone lyricsfile">
+                        <i class="fa-solid fa-upload fa-2x"></i>
+                        <input type="file" class="file" id="lyrics-file" />
+                        <label for="lyrics-file">Choose only one text file to upload</label>
+                        <h3>or drag & drop your srt file here</h3>
+                    </div>
+                    <div class="chip-container"></div>
+                    
+                    <p>Background Image (Optional)</p>
+                    <div class="file-dropzone imagefile">
+                        <i class="fa-solid fa-upload fa-2x"></i>
+                        <input type="file" class="file" id="image-file" accept="image/jpeg, image/png"/>
+                        <label for="image-file">Choose only one image file to upload</label>
+                        <h3>or drag & drop your jpeg or png file here</h3>
+                    </div>
+                    <div class="chip-container"></div>
                 </div>
-                <div class="chip-container"></div>
-                
-                <p>Background Image (Optional)</p>
-                <div class="file-dropzone imagefile">
-                    <i class="fa-solid fa-upload fa-2x"></i>
-                    <input type="file" class="file" id="image-file" accept="image/jpeg, image/png"/>
-                    <label for="image-file">Choose only one image file to upload</label>
-                    <h3>or drag & drop your jpeg or png file here</h3>
-                </div>
-                <div class="chip-container"></div>
 
                 <button id="audioplay-button" disabled="true">Play</button>
                 <button id="export-button" disabled="true">Export</button>

@@ -37,6 +37,15 @@
     background-color: var(--catskill-white-color);    
 }
 
+.setting-panel {
+    position: relative;
+    border-radius: 5px;
+}
+
+#settingPanelBackdrop {
+    border-radius: 5px;
+}
+
 .backdrop {
     display: none;
     position: absolute;
@@ -47,7 +56,6 @@
     margin:auto;
     background-color:rgba(0,0,0,0.3);
     z-index:99999;
-
 }
 
 .pop-up {

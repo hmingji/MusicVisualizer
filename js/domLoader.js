@@ -14,7 +14,8 @@ export const previewSession = document.querySelector('.preview-container');
 export const backdrops = document.querySelectorAll('.backdrop');
 export const wavePathButtons = document.querySelectorAll('input[name="wavepath"]');
 export const wordLengthSpan = document.getElementById('wordlength-span');
-export const timerButtons = document.querySelectorAll('input[name=timer]');/** @type {HTMLCanvasElement} */
+export const settingPanelBackdrop = document.getElementById('settingPanelBackdrop');
+export const timerButtons = document.querySelectorAll('input[name=timer]');
 export const baseCanvas = document.getElementById('base-canvas');
 export const timerCanvas = document.getElementById('timer-canvas');
 export const audioCanvas = document.getElementById("audio-visualizer-canvas");

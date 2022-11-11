@@ -615,8 +615,8 @@ function handleFileDrop(e) {
     (0, _domLoader.audioPlayButton).disabled = false;
     (0, _domLoader.exportButton).disabled = false;
     (0, _domLoader.resetButton).disabled = false;
-    e.currentTarget.style.display = "none";
-    (0, _fileUpload.displayFileChip)(files[0], e.currentTarget.nextElementSibling, "audio");
+    (0, _domLoader.audioFileDropzone).style.display = "none";
+    (0, _fileUpload.displayFileChip)(files[0], (0, _domLoader.audioFileDropzone).nextElementSibling, "audio");
 }
 function handleFileInput(e) {
     const { files  } = e.target;
@@ -630,23 +630,31 @@ function handleFileInput(e) {
     (0, _domLoader.audioPlayButton).disabled = false;
     (0, _domLoader.exportButton).disabled = false;
     (0, _domLoader.resetButton).disabled = false;
-    e.currentTarget.parentElement.style.display = "none";
-    (0, _fileUpload.displayFileChip)(files[0], e.currentTarget.parentElement.nextElementSibling, "audio");
-    e.currentTarget.value = "";
+    (0, _domLoader.audioFileInput).parentElement.style.display = "none";
+    (0, _fileUpload.displayFileChip)(files[0], (0, _domLoader.audioFileInput).parentElement.nextElementSibling, "audio");
+    (0, _domLoader.audioFileInput).value = "";
 }
 function setAudioHandler() {
     (0, _domLoader.audio).addEventListener("play", (e)=>{
         isRunning = true;
-        console.log(getAudioPlayState());
         (0, _domLoader.audioPlayButton).textContent = "Pause";
+        (0, _domLoader.settingPanelBackdrop).style.display = "block";
+        (0, _domLoader.resetButton).disabled = true;
+        (0, _domLoader.exportButton).disabled = true;
     });
     (0, _domLoader.audio).addEventListener("pause", (e)=>{
         isRunning = false;
         (0, _domLoader.audioPlayButton).textContent = "Play";
+        (0, _domLoader.settingPanelBackdrop).style.display = "none";
+        (0, _domLoader.resetButton).disabled = false;
+        (0, _domLoader.exportButton).disabled = false;
     });
     (0, _domLoader.audio).addEventListener("ended", (e)=>{
         isRunning = false;
-        return;
+        (0, _domLoader.audioPlayButton).textContent = "Play";
+        (0, _domLoader.settingPanelBackdrop).style.display = "none";
+        (0, _domLoader.resetButton).disabled = false;
+        (0, _domLoader.exportButton).disabled = false;
     });
 }
 
@@ -792,6 +800,7 @@ parcelHelpers.export(exports, "previewSession", ()=>previewSession);
 parcelHelpers.export(exports, "backdrops", ()=>backdrops);
 parcelHelpers.export(exports, "wavePathButtons", ()=>wavePathButtons);
 parcelHelpers.export(exports, "wordLengthSpan", ()=>wordLengthSpan);
+parcelHelpers.export(exports, "settingPanelBackdrop", ()=>settingPanelBackdrop);
 parcelHelpers.export(exports, "timerButtons", ()=>timerButtons);
 parcelHelpers.export(exports, "baseCanvas", ()=>baseCanvas);
 parcelHelpers.export(exports, "timerCanvas", ()=>timerCanvas);
@@ -812,7 +821,8 @@ const previewSession = document.querySelector(".preview-container");
 const backdrops = document.querySelectorAll(".backdrop");
 const wavePathButtons = document.querySelectorAll('input[name="wavepath"]');
 const wordLengthSpan = document.getElementById("wordlength-span");
-const timerButtons = document.querySelectorAll("input[name=timer]"); /** @type {HTMLCanvasElement} */ 
+const settingPanelBackdrop = document.getElementById("settingPanelBackdrop");
+const timerButtons = document.querySelectorAll("input[name=timer]");
 const baseCanvas = document.getElementById("base-canvas");
 const timerCanvas = document.getElementById("timer-canvas");
 const audioCanvas = document.getElementById("audio-visualizer-canvas");
@@ -850,8 +860,8 @@ function handleFileDrop(e) {
         "image/png"
     ])) return alert("File type uploaded is not correct.");
     image.src = URL.createObjectURL(files[0]);
-    e.currentTarget.style.display = "none";
-    (0, _fileUpload.displayFileChip)(files[0], e.currentTarget.nextElementSibling, "image");
+    (0, _domLoader.imageFileDropzone).style.display = "none";
+    (0, _fileUpload.displayFileChip)(files[0], (0, _domLoader.imageFileDropzone).nextElementSibling, "image");
 }
 function handleFileInput(e) {
     const { files  } = e.target;
@@ -861,9 +871,9 @@ function handleFileInput(e) {
         "image/png"
     ])) return alert("File type uploaded is not correct.");
     image.src = URL.createObjectURL(files[0]);
-    e.currentTarget.parentElement.style.display = "none";
-    (0, _fileUpload.displayFileChip)(files[0], e.currentTarget.parentElement.nextElementSibling, "image");
-    e.currentTarget.value = "";
+    (0, _domLoader.imageFileInput).parentElement.style.display = "none";
+    (0, _fileUpload.displayFileChip)(files[0], (0, _domLoader.imageFileInput).parentElement.nextElementSibling, "image");
+    (0, _domLoader.imageFileInput).value = "";
 }
 
 },{"./fileUpload":"6St3o","./domLoader":"hbKVM","./util/isMultipleFiles":"hUaZm","./util/isCorrectFileType":"7sF3r","./util/setElementActiveState":"gtRTI","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"hUaZm":[function(require,module,exports) {
@@ -915,7 +925,6 @@ function resetLyrics() {
 async function handleFileDrop(e) {
     e.preventDefault();
     (0, _setElementActiveState.setElementActiveState)(e.currentTarget, false);
-    console.log(e.currentTarget);
     const { files  } = e.dataTransfer;
     if ((0, _isMultipleFiles.isMultipleFiles)(files)) return alert("Only one audio file to be uploaded.");
     await files[0].text().then((result)=>{
@@ -924,9 +933,8 @@ async function handleFileDrop(e) {
         console.log(error);
     });
     if (lyricsObjs.length == 0) return alert("Unable to read the file.");
-    //need to refer to the dom directly.
-    e.currentTarget.style.display = "none";
-    (0, _fileUpload.displayFileChip)(files[0], e.currentTarget.nextElementSibling, "lyrics");
+    (0, _domLoader.lyricsFileDropzone).style.display = "none";
+    (0, _fileUpload.displayFileChip)(files[0], (0, _domLoader.lyricsFileDropzone).nextElementSibling, "lyrics");
 }
 async function handleFileInput(e) {
     const { files  } = e.target;
@@ -937,9 +945,9 @@ async function handleFileInput(e) {
         console.log(error);
     });
     if (lyricsObjs.length == 0) return alert("Unable to read the file.");
-    e.target.parentElement.style.display = "none";
-    (0, _fileUpload.displayFileChip)(files[0], e.target.parentElement.nextElementSibling, "lyrics");
-    e.target.value = "";
+    (0, _domLoader.lyricsFileInput).parentElement.style.display = "none";
+    (0, _fileUpload.displayFileChip)(files[0], (0, _domLoader.lyricsFileInput).parentElement.nextElementSibling, "lyrics");
+    (0, _domLoader.lyricsFileInput).value = "";
 }
 
 },{"./fileUpload":"6St3o","./domLoader":"hbKVM","./util/isMultipleFiles":"hUaZm","./util/setElementActiveState":"gtRTI","./util/srtParser":"bZHTW","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"bZHTW":[function(require,module,exports) {

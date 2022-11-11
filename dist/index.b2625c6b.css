@@ -36,6 +36,15 @@
   overflow: auto;
 }
 
+.setting-panel {
+  border-radius: 5px;
+  position: relative;
+}
+
+#settingPanelBackdrop {
+  border-radius: 5px;
+}
+
 .backdrop {
   width: 100%;
   height: 100%;
