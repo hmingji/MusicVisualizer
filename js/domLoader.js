@@ -11,7 +11,7 @@ export const audioPlayButton = document.querySelector('#audioplay-button');
 export const exportButton = document.querySelector('#export-button');
 export const resetButton = document.querySelector('#reset-button');
 export const previewSession = document.querySelector('.preview-container');
-export const backdrops = document.querySelectorAll('.backdrop.export');
+export const backdrops = document.querySelectorAll('#export-backdrop');
 export const wavePathButtons = document.querySelectorAll('input[name="wavepath"]');
 export const wordLengthSpan = document.getElementById('wordlength-span');
 export const settingPanelBackdrop = document.getElementById('settingPanelBackdrop');
