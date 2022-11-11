@@ -1,5 +1,5 @@
 import { setFileDropEventHandler, setFileInputHandler, displayFileChip } from "./fileUpload";
-import { audioFileDropzone, audioFileInput, audioPlayButton, resetButton, exportButton, audio, settingPanelBackdrop } from "./domLoader";
+import { audioFileDropzone, audioFileInput, audioPlayButton, resetButton, exportButton, audio, settingPanelBackdrop, backdrops } from "./domLoader";
 import { isMultipleFiles } from "./util/isMultipleFiles";
 import { isCorrectFileType } from "./util/isCorrectFileType";
 import { setElementActiveState } from "./util/setElementActiveState";
@@ -98,7 +98,7 @@ function setAudioHandler() {
     audio.addEventListener('play', (e) => {
         isRunning = true;
         audioPlayButton.textContent = 'Pause';
-        settingPanelBackdrop.style.display = 'block';
+        if (backdrops.style.display !== 'block') settingPanelBackdrop.style.display = 'block';
         resetButton.disabled = true;
         exportButton.disabled = true;
         animateCanvas();

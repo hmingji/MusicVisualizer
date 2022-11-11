@@ -1,3 +1,5 @@
+import { getAudioPlayState } from "../audio";
+
 export function record(stream, time) {
     let recordedChunks = [];
     return new Promise(function (res, rej) {
@@ -10,7 +12,7 @@ export function record(stream, time) {
         mediaRecorder.ondataavailable = function (event) {
             recordedChunks.push(event.data);
 
-            if (!isRunning) {
+            if (!getAudioPlayState()) {
                 mediaRecorder.stop();
             }
         }
