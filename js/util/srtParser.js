@@ -18,8 +18,9 @@ export function srtParser(strContent) {
 
     strContent = strContent.replace(/\r\n|\r|\n/g, "\n");
     strContent = strContent.concat("EndOfString");
-    const matches = pattern.exec(strContent);
-    while (matches != null) {
+
+    let matches;
+    while ((matches = pattern.exec(strContent)) != null) {
         result.push(convertIntoLineObj(matches));
     }
 
