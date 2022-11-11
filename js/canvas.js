@@ -158,6 +158,12 @@ function drawBaseForCircularWave() {
     drawText(baseCanvasCtx, title, primary, { x: baseCanvas.width * 0.01, y: baseCanvas.height * 0.3 });
 }
 
+export function resetCanvas() {
+    baseCanvasCtx.clearRect(0, 0, baseCanvas.width, baseCanvas.height);
+    audioCanvasCtx.clearRect(0, 0, audioCanvas.width, audioCanvas.height);
+    timerCanvasCtx.clearRect(0, 0, timerCanvas.width, timerCanvas.height);
+}
+
 export function animateCanvas() {
     const audioAnalyser = initAudioAnalyser();
     const bufferLength = audioAnalyser.frequencyBinCount;

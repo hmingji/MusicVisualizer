@@ -1,3 +1,4 @@
+import { resetCanvas } from "./canvas";
 import { titleInput, wordLengthSpan, resetButton } from "./domLoader";
 import { removeFile } from "./util/removeFile"
 
@@ -11,6 +12,7 @@ export function initReset() {
         fileDropElements.forEach((item) => item.style.display = 'flex');
         titleInput.value = '';
         wordLengthSpan.textContent = '0 / 50';
+        resetCanvas();
     })
 }
 
