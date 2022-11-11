@@ -2,10 +2,10 @@
   "name": "musicvisualizer",
   "version": "1.0.0",
   "description": "Using html5 canvas to visualize audio spectrum, display lyrics and play time for simple music video.  \r &nbsp;",
-  "main": "index.js",
+  "default": "index.html",
   "scripts": {
     "dev": "parcel index.html",
-    "build": "NODE_ENV=production parvel build index.html"
+    "build": "parcel build index.html"
   },
   "repository": {
     "type": "git",
